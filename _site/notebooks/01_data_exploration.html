@@ -1,0 +1,3288 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>data_exploration – Soccer Player Performance and Valuation Analytics</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-445b8638c3d06994fee0907d791121c4.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.min.js" integrity="sha384-c9c+LnTbwQ3aujuU7ULEPVvgLs+Fn6fJUvIGTsuu1ZcCf11fiEubah0ttpca4ntM sha384-6V1/AdqZRWk1KAlWbKBlGhN7VG4iE/yAZcO6NZPMF8od0vukrvr0tg4qY6NSrItx" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+
+<link rel="stylesheet" href="../styles.css">
+</head>
+
+<body class="nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">Soccer Player Performance and Valuation Analytics</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../index.html"> 
+<span class="menu-text">Introduction</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../dataprep_eda.html"> 
+<span class="menu-text">Data Prep &amp; EDA</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../clustering.html"> 
+<span class="menu-text">Clustering</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../pca.html"> 
+<span class="menu-text">PCA</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../naivebayes.html"> 
+<span class="menu-text">Naive Bayes</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../dectrees.html"> 
+<span class="menu-text">Decision Trees</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../svms.html"> 
+<span class="menu-text">SVM</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../regression.html"> 
+<span class="menu-text">Regression</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../nn.html"> 
+<span class="menu-text">Neural Networks</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../conclusions.html"> 
+<span class="menu-text">Conclusion</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+        
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"></header>
+
+
+
+
+<div id="b1378359" class="cell" data-execution_count="117">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>pd.set_option(<span class="st">'display.max_columns'</span>, <span class="va">None</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="14ec0ac3" class="cell" data-execution_count="118">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>players <span class="op">=</span> pd.read_csv(<span class="st">'../data/raw/players.csv'</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(players.shape)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>players.head()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>(50149, 26)</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="118">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">player_id</th>
+<th data-quarto-table-cell-role="th">first_name</th>
+<th data-quarto-table-cell-role="th">last_name</th>
+<th data-quarto-table-cell-role="th">name</th>
+<th data-quarto-table-cell-role="th">last_season</th>
+<th data-quarto-table-cell-role="th">current_club_id</th>
+<th data-quarto-table-cell-role="th">player_code</th>
+<th data-quarto-table-cell-role="th">country_of_birth</th>
+<th data-quarto-table-cell-role="th">city_of_birth</th>
+<th data-quarto-table-cell-role="th">country_of_citizenship</th>
+<th data-quarto-table-cell-role="th">date_of_birth</th>
+<th data-quarto-table-cell-role="th">sub_position</th>
+<th data-quarto-table-cell-role="th">position</th>
+<th data-quarto-table-cell-role="th">foot</th>
+<th data-quarto-table-cell-role="th">height_in_cm</th>
+<th data-quarto-table-cell-role="th">contract_expiration_date</th>
+<th data-quarto-table-cell-role="th">agent_name</th>
+<th data-quarto-table-cell-role="th">image_url</th>
+<th data-quarto-table-cell-role="th">international_caps</th>
+<th data-quarto-table-cell-role="th">international_goals</th>
+<th data-quarto-table-cell-role="th">current_national_team_id</th>
+<th data-quarto-table-cell-role="th">url</th>
+<th data-quarto-table-cell-role="th">current_club_domestic_competition_id</th>
+<th data-quarto-table-cell-role="th">current_club_name</th>
+<th data-quarto-table-cell-role="th">market_value_in_eur</th>
+<th data-quarto-table-cell-role="th">highest_market_value_in_eur</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">0</th>
+<td>10</td>
+<td>Miroslav</td>
+<td>Klose</td>
+<td>Miroslav Klose</td>
+<td>2015</td>
+<td>398</td>
+<td>miroslav-klose</td>
+<td>Poland</td>
+<td>Opole</td>
+<td>Germany</td>
+<td>1978-06-09 00:00:00</td>
+<td>Centre-Forward</td>
+<td>Attack</td>
+<td>right</td>
+<td>184.0</td>
+<td>NaN</td>
+<td>ASBW Sport Marketing</td>
+<td>https://img.a.transfermarkt.technology/portrai...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>https://www.transfermarkt.co.uk/miroslav-klose...</td>
+<td>IT1</td>
+<td>Società Sportiva Lazio S.p.A.</td>
+<td>1000000.0</td>
+<td>30000000.0</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">1</th>
+<td>26</td>
+<td>Roman</td>
+<td>Weidenfeller</td>
+<td>Roman Weidenfeller</td>
+<td>2017</td>
+<td>16</td>
+<td>roman-weidenfeller</td>
+<td>Germany</td>
+<td>Diez</td>
+<td>Germany</td>
+<td>1980-08-06 00:00:00</td>
+<td>Goalkeeper</td>
+<td>Goalkeeper</td>
+<td>left</td>
+<td>190.0</td>
+<td>NaN</td>
+<td>Neubauer 13 GmbH</td>
+<td>https://img.a.transfermarkt.technology/portrai...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>https://www.transfermarkt.co.uk/roman-weidenfe...</td>
+<td>L1</td>
+<td>Borussia Dortmund</td>
+<td>750000.0</td>
+<td>8000000.0</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">2</th>
+<td>65</td>
+<td>Dimitar</td>
+<td>Berbatov</td>
+<td>Dimitar Berbatov</td>
+<td>2015</td>
+<td>1091</td>
+<td>dimitar-berbatov</td>
+<td>Bulgaria</td>
+<td>Blagoevgrad</td>
+<td>Bulgaria</td>
+<td>1981-01-30 00:00:00</td>
+<td>Centre-Forward</td>
+<td>Attack</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>CSKA-AS-23 Ltd.</td>
+<td>https://img.a.transfermarkt.technology/portrai...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>https://www.transfermarkt.co.uk/dimitar-berbat...</td>
+<td>GR1</td>
+<td>Panthessalonikios Athlitikos Omilos Konstantin...</td>
+<td>1000000.0</td>
+<td>34500000.0</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">3</th>
+<td>77</td>
+<td>NaN</td>
+<td>Lúcio</td>
+<td>Lúcio</td>
+<td>2012</td>
+<td>506</td>
+<td>lucio</td>
+<td>Brazil</td>
+<td>Brasília</td>
+<td>Brazil</td>
+<td>1978-05-08 00:00:00</td>
+<td>Centre-Back</td>
+<td>Defender</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>https://img.a.transfermarkt.technology/portrai...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>https://www.transfermarkt.co.uk/lucio/profil/s...</td>
+<td>IT1</td>
+<td>Juventus FC</td>
+<td>200000.0</td>
+<td>24500000.0</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">4</th>
+<td>80</td>
+<td>Tom</td>
+<td>Starke</td>
+<td>Tom Starke</td>
+<td>2017</td>
+<td>27</td>
+<td>tom-starke</td>
+<td>East Germany (GDR)</td>
+<td>Freital</td>
+<td>Germany</td>
+<td>1981-03-18 00:00:00</td>
+<td>Goalkeeper</td>
+<td>Goalkeeper</td>
+<td>right</td>
+<td>194.0</td>
+<td>NaN</td>
+<td>IFM</td>
+<td>https://img.a.transfermarkt.technology/portrai...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>https://www.transfermarkt.co.uk/tom-starke/pro...</td>
+<td>L1</td>
+<td>Bayern Munich</td>
+<td>100000.0</td>
+<td>3000000.0</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div id="011b18cd" class="cell" data-execution_count="119">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(players.columns.to_list())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>['player_id', 'first_name', 'last_name', 'name', 'last_season', 'current_club_id', 'player_code', 'country_of_birth', 'city_of_birth', 'country_of_citizenship', 'date_of_birth', 'sub_position', 'position', 'foot', 'height_in_cm', 'contract_expiration_date', 'agent_name', 'image_url', 'international_caps', 'international_goals', 'current_national_team_id', 'url', 'current_club_domestic_competition_id', 'current_club_name', 'market_value_in_eur', 'highest_market_value_in_eur']</code></pre>
+</div>
+</div>
+<div id="41fb584d" class="cell" data-execution_count="120">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>appearances <span class="op">=</span> pd.read_csv(<span class="st">'../data/raw/appearances.csv'</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(appearances.shape)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>appearances.head()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>(1894350, 13)</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="120">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">appearance_id</th>
+<th data-quarto-table-cell-role="th">game_id</th>
+<th data-quarto-table-cell-role="th">player_id</th>
+<th data-quarto-table-cell-role="th">player_club_id</th>
+<th data-quarto-table-cell-role="th">player_current_club_id</th>
+<th data-quarto-table-cell-role="th">date</th>
+<th data-quarto-table-cell-role="th">player_name</th>
+<th data-quarto-table-cell-role="th">competition_id</th>
+<th data-quarto-table-cell-role="th">yellow_cards</th>
+<th data-quarto-table-cell-role="th">red_cards</th>
+<th data-quarto-table-cell-role="th">goals</th>
+<th data-quarto-table-cell-role="th">assists</th>
+<th data-quarto-table-cell-role="th">minutes_played</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">0</th>
+<td>2231978_38004</td>
+<td>2231978</td>
+<td>38004</td>
+<td>853</td>
+<td>235</td>
+<td>2012-07-03</td>
+<td>Aurélien Joachim</td>
+<td>CLQ</td>
+<td>0</td>
+<td>0</td>
+<td>2</td>
+<td>0</td>
+<td>90</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">1</th>
+<td>2233748_79232</td>
+<td>2233748</td>
+<td>79232</td>
+<td>8841</td>
+<td>2698</td>
+<td>2012-07-05</td>
+<td>Ruslan Abyshov</td>
+<td>ELQ</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>90</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">2</th>
+<td>2234413_42792</td>
+<td>2234413</td>
+<td>42792</td>
+<td>6251</td>
+<td>465</td>
+<td>2012-07-05</td>
+<td>Sander Puri</td>
+<td>ELQ</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>45</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">3</th>
+<td>2234418_73333</td>
+<td>2234418</td>
+<td>73333</td>
+<td>1274</td>
+<td>76</td>
+<td>2012-07-05</td>
+<td>Vegar Hedenstad</td>
+<td>ELQ</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>90</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">4</th>
+<td>2234421_122011</td>
+<td>2234421</td>
+<td>122011</td>
+<td>195</td>
+<td>3008</td>
+<td>2012-07-05</td>
+<td>Markus Henriksen</td>
+<td>ELQ</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td>90</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div id="73fcbc81" class="cell" data-execution_count="121">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>valuations <span class="op">=</span> pd.read_csv(<span class="st">'../data/raw/player_valuations.csv'</span>)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(valuations.shape)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>valuations.head()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>(656301, 6)</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="121">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">player_id</th>
+<th data-quarto-table-cell-role="th">date</th>
+<th data-quarto-table-cell-role="th">market_value_in_eur</th>
+<th data-quarto-table-cell-role="th">current_club_name</th>
+<th data-quarto-table-cell-role="th">current_club_id</th>
+<th data-quarto-table-cell-role="th">player_club_domestic_competition_id</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">0</th>
+<td>405973</td>
+<td>2000-01-20</td>
+<td>150000</td>
+<td>Unknown</td>
+<td>3057</td>
+<td>BE1</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">1</th>
+<td>342216</td>
+<td>2001-07-20</td>
+<td>100000</td>
+<td>Unknown</td>
+<td>1241</td>
+<td>SC1</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">2</th>
+<td>3132</td>
+<td>2003-12-09</td>
+<td>400000</td>
+<td>Dynamo Kyiv</td>
+<td>126</td>
+<td>TR1</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">3</th>
+<td>6893</td>
+<td>2003-12-15</td>
+<td>900000</td>
+<td>Galatasaray</td>
+<td>984</td>
+<td>GB1</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">4</th>
+<td>10</td>
+<td>2004-10-04</td>
+<td>7000000</td>
+<td>SV Werder Bremen</td>
+<td>398</td>
+<td>IT1</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div id="29f060b7" class="cell" data-execution_count="122">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> requests</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>API_KEY <span class="op">=</span> <span class="st">"2a75dfb3bfa949809e2e2512c497316f"</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>BASE_URL <span class="op">=</span> <span class="st">"https://api.football-data.org/v4"</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>headers <span class="op">=</span> {</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"X-Auth-Token"</span>: API_KEY}</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>response <span class="op">=</span> requests.get(<span class="ss">f"</span><span class="sc">{</span>BASE_URL<span class="sc">}</span><span class="ss">/competitions/PL/standings"</span>, headers<span class="op">=</span>headers)</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(response.status_code)</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> response.json()</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>data</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>200</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="122">
+<pre><code>{'filters': {'season': '2026'},
+ 'area': {'id': 2072,
+  'name': 'England',
+  'code': 'ENG',
+  'flag': 'https://crests.football-data.org/770.svg'},
+ 'competition': {'id': 2021,
+  'name': 'Premier League',
+  'code': 'PL',
+  'type': 'LEAGUE',
+  'emblem': 'https://crests.football-data.org/PL.png'},
+ 'season': {'id': 2502,
+  'startDate': '2026-08-21',
+  'endDate': '2027-05-30',
+  'currentMatchday': 5,
+  'winner': None},
+ 'standings': [{'stage': 'REGULAR_SEASON',
+   'type': 'TOTAL',
+   'group': 'Matchday',
+   'table': [{'position': 1,
+     'team': {'id': 57,
+      'name': 'Arsenal FC',
+      'shortName': 'Arsenal',
+      'tla': 'ARS',
+      'crest': 'https://crests.football-data.org/57.png'},
+     'playedGames': 4,
+     'form': None,
+     'won': 4,
+     'draw': 0,
+     'lost': 0,
+     'points': 12,
+     'goalsFor': 8,
+     'goalsAgainst': 1,
+     'goalDifference': 7},
+    {'position': 2,
+     'team': {'id': 65,
+      'name': 'Manchester City FC',
+      'shortName': 'Man City',
+      'tla': 'MCI',
+      'crest': 'https://crests.football-data.org/65.png'},
+     'playedGames': 4,
+     'form': None,
+     'won': 4,
+     'draw': 0,
+     'lost': 0,
+     'points': 12,
+     'goalsFor': 8,
+     'goalsAgainst': 2,
+     'goalDifference': 6},
+    {'position': 3,
+     'team': {'id': 402,
+      'name': 'Brentford FC',
+      'shortName': 'Brentford',
+      'tla': 'BRE',
+      'crest': 'https://crests.football-data.org/402.png'},
+     'playedGames': 5,
+     'form': None,
+     'won': 2,
+     'draw': 3,
+     'lost': 0,
+     'points': 9,
+     'goalsFor': 10,
+     'goalsAgainst': 4,
+     'goalDifference': 6},
+    {'position': 4,
+     'team': {'id': 341,
+      'name': 'Leeds United FC',
+      'shortName': 'Leeds United',
+      'tla': 'LEE',
+      'crest': 'https://crests.football-data.org/341.png'},
+     'playedGames': 4,
+     'form': None,
+     'won': 2,
+     'draw': 2,
+     'lost': 0,
+     'points': 8,
+     'goalsFor': 7,
+     'goalsAgainst': 3,
+     'goalDifference': 4},
+    {'position': 5,
+     'team': {'id': 322,
+      'name': 'Hull City AFC',
+      'shortName': 'Hull City',
+      'tla': 'HUL',
+      'crest': 'https://crests.football-data.org/322.png'},
+     'playedGames': 4,
+     'form': None,
+     'won': 2,
+     'draw': 2,
+     'lost': 0,
+     'points': 8,
+     'goalsFor': 5,
+     'goalsAgainst': 2,
+     'goalDifference': 3},
+    {'position': 6,
+     'team': {'id': 397,
+      'name': 'Brighton &amp; Hove Albion FC',
+      'shortName': 'Brighton Hove',
+      'tla': 'BHA',
+      'crest': 'https://crests.football-data.org/397.png'},
+     'playedGames': 4,
+     'form': None,
+     'won': 2,
+     'draw': 1,
+     'lost': 1,
+     'points': 7,
+     'goalsFor': 13,
+     'goalsAgainst': 5,
+     'goalDifference': 8},
+    {'position': 7,
+     'team': {'id': 61,
+      'name': 'Chelsea FC',
+      'shortName': 'Chelsea',
+      'tla': 'CHE',
+      'crest': 'https://crests.football-data.org/61.png'},
+     'playedGames': 5,
+     'form': None,
+     'won': 2,
+     'draw': 1,
+     'lost': 2,
+     'points': 7,
+     'goalsFor': 10,
+     'goalsAgainst': 12,
+     'goalDifference': -2},
+    {'position': 8,
+     'team': {'id': 64,
+      'name': 'Liverpool FC',
+      'shortName': 'Liverpool',
+      'tla': 'LIV',
+      'crest': 'https://crests.football-data.org/64.png'},
+     'playedGames': 4,
+     'form': None,
+     'won': 1,
+     'draw': 3,
+     'lost': 0,
+     'points': 6,
+     'goalsFor': 6,
+     'goalsAgainst': 4,
+     'goalDifference': 2},
+    {'position': 9,
+     'team': {'id': 62,
+      'name': 'Everton FC',
+      'shortName': 'Everton',
+      'tla': 'EVE',
+      'crest': 'https://crests.football-data.org/62.png'},
+     'playedGames': 4,
+     'form': None,
+     'won': 1,
+     'draw': 3,
+     'lost': 0,
+     'points': 6,
+     'goalsFor': 5,
+     'goalsAgainst': 3,
+     'goalDifference': 2},
+    {'position': 10,
+     'team': {'id': 349,
+      'name': 'Ipswich Town FC',
+      'shortName': 'Ipswich Town',
+      'tla': 'IPS',
+      'crest': 'https://crests.football-data.org/349.png'},
+     'playedGames': 4,
+     'form': None,
+     'won': 2,
+     'draw': 0,
+     'lost': 2,
+     'points': 6,
+     'goalsFor': 7,
+     'goalsAgainst': 10,
+     'goalDifference': -3},
+    {'position': 11,
+     'team': {'id': 351,
+      'name': 'Nottingham Forest FC',
+      'shortName': 'Nottingham',
+      'tla': 'NOT',
+      'crest': 'https://crests.football-data.org/351.png'},
+     'playedGames': 4,
+     'form': None,
+     'won': 1,
+     'draw': 2,
+     'lost': 1,
+     'points': 5,
+     'goalsFor': 4,
+     'goalsAgainst': 4,
+     'goalDifference': 0},
+    {'position': 12,
+     'team': {'id': 67,
+      'name': 'Newcastle United FC',
+      'shortName': 'Newcastle',
+      'tla': 'NEW',
+      'crest': 'https://crests.football-data.org/67.png'},
+     'playedGames': 4,
+     'form': None,
+     'won': 1,
+     'draw': 2,
+     'lost': 1,
+     'points': 5,
+     'goalsFor': 7,
+     'goalsAgainst': 8,
+     'goalDifference': -1},
+    {'position': 13,
+     'team': {'id': 66,
+      'name': 'Manchester United FC',
+      'shortName': 'Man United',
+      'tla': 'MUN',
+      'crest': 'https://crests.football-data.org/66.png'},
+     'playedGames': 4,
+     'form': None,
+     'won': 1,
+     'draw': 1,
+     'lost': 2,
+     'points': 4,
+     'goalsFor': 7,
+     'goalsAgainst': 7,
+     'goalDifference': 0},
+    {'position': 14,
+     'team': {'id': 71,
+      'name': 'Sunderland AFC',
+      'shortName': 'Sunderland',
+      'tla': 'SUN',
+      'crest': 'https://crests.football-data.org/71.png'},
+     'playedGames': 4,
+     'form': None,
+     'won': 1,
+     'draw': 1,
+     'lost': 2,
+     'points': 4,
+     'goalsFor': 3,
+     'goalsAgainst': 5,
+     'goalDifference': -2},
+    {'position': 15,
+     'team': {'id': 1044,
+      'name': 'AFC Bournemouth',
+      'shortName': 'Bournemouth',
+      'tla': 'BOU',
+      'crest': 'https://crests.football-data.org/bournemouth.png'},
+     'playedGames': 4,
+     'form': None,
+     'won': 0,
+     'draw': 3,
+     'lost': 1,
+     'points': 3,
+     'goalsFor': 6,
+     'goalsAgainst': 7,
+     'goalDifference': -1},
+    {'position': 16,
+     'team': {'id': 354,
+      'name': 'Crystal Palace FC',
+      'shortName': 'Crystal Palace',
+      'tla': 'CRY',
+      'crest': 'https://crests.football-data.org/354.png'},
+     'playedGames': 4,
+     'form': None,
+     'won': 1,
+     'draw': 0,
+     'lost': 3,
+     'points': 3,
+     'goalsFor': 6,
+     'goalsAgainst': 11,
+     'goalDifference': -5},
+    {'position': 17,
+     'team': {'id': 73,
+      'name': 'Tottenham Hotspur FC',
+      'shortName': 'Tottenham',
+      'tla': 'TOT',
+      'crest': 'https://crests.football-data.org/73.png'},
+     'playedGames': 4,
+     'form': None,
+     'won': 0,
+     'draw': 2,
+     'lost': 2,
+     'points': 2,
+     'goalsFor': 0,
+     'goalsAgainst': 5,
+     'goalDifference': -5},
+    {'position': 18,
+     'team': {'id': 63,
+      'name': 'Fulham FC',
+      'shortName': 'Fulham',
+      'tla': 'FUL',
+      'crest': 'https://crests.football-data.org/63.png'},
+     'playedGames': 4,
+     'form': None,
+     'won': 0,
+     'draw': 1,
+     'lost': 3,
+     'points': 1,
+     'goalsFor': 4,
+     'goalsAgainst': 7,
+     'goalDifference': -3},
+    {'position': 19,
+     'team': {'id': 58,
+      'name': 'Aston Villa FC',
+      'shortName': 'Aston Villa',
+      'tla': 'AVL',
+      'crest': 'https://crests.football-data.org/58.png'},
+     'playedGames': 4,
+     'form': None,
+     'won': 0,
+     'draw': 1,
+     'lost': 3,
+     'points': 1,
+     'goalsFor': 1,
+     'goalsAgainst': 7,
+     'goalDifference': -6},
+    {'position': 20,
+     'team': {'id': 1076,
+      'name': 'Coventry City FC',
+      'shortName': 'Coventry City',
+      'tla': 'COV',
+      'crest': 'https://crests.football-data.org/1076.png'},
+     'playedGames': 4,
+     'form': None,
+     'won': 0,
+     'draw': 0,
+     'lost': 4,
+     'points': 0,
+     'goalsFor': 0,
+     'goalsAgainst': 10,
+     'goalDifference': -10}]}]}</code></pre>
+</div>
+</div>
+<div id="a0b55a5a" class="cell" data-execution_count="123">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>table <span class="op">=</span> data[<span class="st">'standings'</span>][<span class="dv">0</span>][<span class="st">'table'</span>]</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>standings_rows <span class="op">=</span> []</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> row <span class="kw">in</span> table:</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    standings_rows.append({</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>        <span class="st">'position'</span>: row[<span class="st">'position'</span>],</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">'team'</span>: row[<span class="st">'team'</span>][<span class="st">'name'</span>],</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>        <span class="st">'played'</span>: row[<span class="st">'playedGames'</span>],</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>        <span class="st">'won'</span>: row[<span class="st">'won'</span>],</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>        <span class="st">'draw'</span>: row[<span class="st">'draw'</span>],</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>        <span class="st">'lost'</span>: row[<span class="st">'lost'</span>],</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>        <span class="st">'points'</span>: row[<span class="st">'points'</span>],</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>        <span class="st">'goals_for'</span>: row[<span class="st">'goalsFor'</span>],</span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>        <span class="st">'goals_against'</span>: row[<span class="st">'goalsAgainst'</span>],</span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>        <span class="st">'goal_difference'</span>: row[<span class="st">'goalDifference'</span>]</span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>    })</span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>standings_df <span class="op">=</span> pd.DataFrame(standings_rows)</span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>standings_df</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="123">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">position</th>
+<th data-quarto-table-cell-role="th">team</th>
+<th data-quarto-table-cell-role="th">played</th>
+<th data-quarto-table-cell-role="th">won</th>
+<th data-quarto-table-cell-role="th">draw</th>
+<th data-quarto-table-cell-role="th">lost</th>
+<th data-quarto-table-cell-role="th">points</th>
+<th data-quarto-table-cell-role="th">goals_for</th>
+<th data-quarto-table-cell-role="th">goals_against</th>
+<th data-quarto-table-cell-role="th">goal_difference</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">0</th>
+<td>1</td>
+<td>Arsenal FC</td>
+<td>4</td>
+<td>4</td>
+<td>0</td>
+<td>0</td>
+<td>12</td>
+<td>8</td>
+<td>1</td>
+<td>7</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">1</th>
+<td>2</td>
+<td>Manchester City FC</td>
+<td>4</td>
+<td>4</td>
+<td>0</td>
+<td>0</td>
+<td>12</td>
+<td>8</td>
+<td>2</td>
+<td>6</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">2</th>
+<td>3</td>
+<td>Brentford FC</td>
+<td>5</td>
+<td>2</td>
+<td>3</td>
+<td>0</td>
+<td>9</td>
+<td>10</td>
+<td>4</td>
+<td>6</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">3</th>
+<td>4</td>
+<td>Leeds United FC</td>
+<td>4</td>
+<td>2</td>
+<td>2</td>
+<td>0</td>
+<td>8</td>
+<td>7</td>
+<td>3</td>
+<td>4</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">4</th>
+<td>5</td>
+<td>Hull City AFC</td>
+<td>4</td>
+<td>2</td>
+<td>2</td>
+<td>0</td>
+<td>8</td>
+<td>5</td>
+<td>2</td>
+<td>3</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">5</th>
+<td>6</td>
+<td>Brighton &amp; Hove Albion FC</td>
+<td>4</td>
+<td>2</td>
+<td>1</td>
+<td>1</td>
+<td>7</td>
+<td>13</td>
+<td>5</td>
+<td>8</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">6</th>
+<td>7</td>
+<td>Chelsea FC</td>
+<td>5</td>
+<td>2</td>
+<td>1</td>
+<td>2</td>
+<td>7</td>
+<td>10</td>
+<td>12</td>
+<td>-2</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">7</th>
+<td>8</td>
+<td>Liverpool FC</td>
+<td>4</td>
+<td>1</td>
+<td>3</td>
+<td>0</td>
+<td>6</td>
+<td>6</td>
+<td>4</td>
+<td>2</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">8</th>
+<td>9</td>
+<td>Everton FC</td>
+<td>4</td>
+<td>1</td>
+<td>3</td>
+<td>0</td>
+<td>6</td>
+<td>5</td>
+<td>3</td>
+<td>2</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">9</th>
+<td>10</td>
+<td>Ipswich Town FC</td>
+<td>4</td>
+<td>2</td>
+<td>0</td>
+<td>2</td>
+<td>6</td>
+<td>7</td>
+<td>10</td>
+<td>-3</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">10</th>
+<td>11</td>
+<td>Nottingham Forest FC</td>
+<td>4</td>
+<td>1</td>
+<td>2</td>
+<td>1</td>
+<td>5</td>
+<td>4</td>
+<td>4</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">11</th>
+<td>12</td>
+<td>Newcastle United FC</td>
+<td>4</td>
+<td>1</td>
+<td>2</td>
+<td>1</td>
+<td>5</td>
+<td>7</td>
+<td>8</td>
+<td>-1</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">12</th>
+<td>13</td>
+<td>Manchester United FC</td>
+<td>4</td>
+<td>1</td>
+<td>1</td>
+<td>2</td>
+<td>4</td>
+<td>7</td>
+<td>7</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">13</th>
+<td>14</td>
+<td>Sunderland AFC</td>
+<td>4</td>
+<td>1</td>
+<td>1</td>
+<td>2</td>
+<td>4</td>
+<td>3</td>
+<td>5</td>
+<td>-2</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">14</th>
+<td>15</td>
+<td>AFC Bournemouth</td>
+<td>4</td>
+<td>0</td>
+<td>3</td>
+<td>1</td>
+<td>3</td>
+<td>6</td>
+<td>7</td>
+<td>-1</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">15</th>
+<td>16</td>
+<td>Crystal Palace FC</td>
+<td>4</td>
+<td>1</td>
+<td>0</td>
+<td>3</td>
+<td>3</td>
+<td>6</td>
+<td>11</td>
+<td>-5</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">16</th>
+<td>17</td>
+<td>Tottenham Hotspur FC</td>
+<td>4</td>
+<td>0</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+<td>0</td>
+<td>5</td>
+<td>-5</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">17</th>
+<td>18</td>
+<td>Fulham FC</td>
+<td>4</td>
+<td>0</td>
+<td>1</td>
+<td>3</td>
+<td>1</td>
+<td>4</td>
+<td>7</td>
+<td>-3</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">18</th>
+<td>19</td>
+<td>Aston Villa FC</td>
+<td>4</td>
+<td>0</td>
+<td>1</td>
+<td>3</td>
+<td>1</td>
+<td>1</td>
+<td>7</td>
+<td>-6</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">19</th>
+<td>20</td>
+<td>Coventry City FC</td>
+<td>4</td>
+<td>0</td>
+<td>0</td>
+<td>4</td>
+<td>0</td>
+<td>0</td>
+<td>10</td>
+<td>-10</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div id="9c3e85bc" class="cell" data-execution_count="124">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>os.makedirs(<span class="st">'../data/api_raw'</span>, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>standings_df.to_csv(<span class="st">'../data/api_raw/pl_standings_2026.csv'</span>, index<span class="op">=</span><span class="va">False</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="a094c9f0" class="cell" data-execution_count="125">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>os.listdir(<span class="st">'../data/api_raw'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="125">
+<pre><code>['pl_standings_2026.csv']</code></pre>
+</div>
+</div>
+<div id="0ffb6283" class="cell" data-execution_count="126">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>player_stats <span class="op">=</span> appearances.groupby(<span class="st">'player_id'</span>).agg(</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>    total_games<span class="op">=</span>(<span class="st">'appearance_id'</span>, <span class="st">'count'</span>),</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>    total_goals<span class="op">=</span>(<span class="st">'goals'</span>, <span class="st">'sum'</span>),</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>    total_assists<span class="op">=</span>(<span class="st">'assists'</span>, <span class="st">'sum'</span>),</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>    total_minutes<span class="op">=</span>(<span class="st">'minutes_played'</span>, <span class="st">'sum'</span>),</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>    total_yellow_cards<span class="op">=</span>(<span class="st">'yellow_cards'</span>, <span class="st">'sum'</span>),</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>    total_red_cards<span class="op">=</span>(<span class="st">'red_cards'</span>, <span class="st">'sum'</span>)</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>).reset_index()</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>player_stats.head()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="126">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">player_id</th>
+<th data-quarto-table-cell-role="th">total_games</th>
+<th data-quarto-table-cell-role="th">total_goals</th>
+<th data-quarto-table-cell-role="th">total_assists</th>
+<th data-quarto-table-cell-role="th">total_minutes</th>
+<th data-quarto-table-cell-role="th">total_yellow_cards</th>
+<th data-quarto-table-cell-role="th">total_red_cards</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">0</th>
+<td>10</td>
+<td>136</td>
+<td>48</td>
+<td>25</td>
+<td>8808</td>
+<td>19</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">1</th>
+<td>26</td>
+<td>152</td>
+<td>0</td>
+<td>0</td>
+<td>13508</td>
+<td>4</td>
+<td>2</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">2</th>
+<td>65</td>
+<td>122</td>
+<td>38</td>
+<td>13</td>
+<td>8788</td>
+<td>11</td>
+<td>1</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">3</th>
+<td>77</td>
+<td>4</td>
+<td>0</td>
+<td>0</td>
+<td>307</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">4</th>
+<td>80</td>
+<td>12</td>
+<td>0</td>
+<td>0</td>
+<td>1080</td>
+<td>0</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div id="4d801304" class="cell" data-execution_count="127">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>latest_valuations <span class="op">=</span> valuations.sort_values(<span class="st">'date'</span>).groupby(<span class="st">'player_id'</span>).tail(<span class="dv">1</span>)</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>latest_valuations <span class="op">=</span> latest_valuations[[<span class="st">'player_id'</span>, <span class="st">'date'</span>, <span class="st">'market_value_in_eur'</span>]]</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>latest_valuations <span class="op">=</span> latest_valuations.rename(columns<span class="op">=</span>{<span class="st">'date'</span>: <span class="st">'valuation_date'</span>})</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>latest_valuations.head()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="127">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">player_id</th>
+<th data-quarto-table-cell-role="th">valuation_date</th>
+<th data-quarto-table-cell-role="th">market_value_in_eur</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">4568</th>
+<td>16733</td>
+<td>2005-12-02</td>
+<td>100000</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">15921</th>
+<td>73096</td>
+<td>2008-04-16</td>
+<td>50000</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">31975</th>
+<td>62553</td>
+<td>2009-10-25</td>
+<td>200000</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">34350</th>
+<td>134354</td>
+<td>2009-12-28</td>
+<td>50000</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">37862</th>
+<td>144619</td>
+<td>2010-03-15</td>
+<td>25000</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div id="9c22ca79" class="cell" data-execution_count="128">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>player_master <span class="op">=</span> players.merge(player_stats, on<span class="op">=</span><span class="st">'player_id'</span>, how<span class="op">=</span><span class="st">'left'</span>)</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>player_master <span class="op">=</span> player_master.merge(latest_valuations, on<span class="op">=</span><span class="st">'player_id'</span>, how<span class="op">=</span><span class="st">'left'</span>)</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(player_master.shape)</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>player_master.head()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>(50149, 34)</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="128">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">player_id</th>
+<th data-quarto-table-cell-role="th">first_name</th>
+<th data-quarto-table-cell-role="th">last_name</th>
+<th data-quarto-table-cell-role="th">name</th>
+<th data-quarto-table-cell-role="th">last_season</th>
+<th data-quarto-table-cell-role="th">current_club_id</th>
+<th data-quarto-table-cell-role="th">player_code</th>
+<th data-quarto-table-cell-role="th">country_of_birth</th>
+<th data-quarto-table-cell-role="th">city_of_birth</th>
+<th data-quarto-table-cell-role="th">country_of_citizenship</th>
+<th data-quarto-table-cell-role="th">date_of_birth</th>
+<th data-quarto-table-cell-role="th">sub_position</th>
+<th data-quarto-table-cell-role="th">position</th>
+<th data-quarto-table-cell-role="th">foot</th>
+<th data-quarto-table-cell-role="th">height_in_cm</th>
+<th data-quarto-table-cell-role="th">contract_expiration_date</th>
+<th data-quarto-table-cell-role="th">agent_name</th>
+<th data-quarto-table-cell-role="th">image_url</th>
+<th data-quarto-table-cell-role="th">international_caps</th>
+<th data-quarto-table-cell-role="th">international_goals</th>
+<th data-quarto-table-cell-role="th">current_national_team_id</th>
+<th data-quarto-table-cell-role="th">url</th>
+<th data-quarto-table-cell-role="th">current_club_domestic_competition_id</th>
+<th data-quarto-table-cell-role="th">current_club_name</th>
+<th data-quarto-table-cell-role="th">market_value_in_eur_x</th>
+<th data-quarto-table-cell-role="th">highest_market_value_in_eur</th>
+<th data-quarto-table-cell-role="th">total_games</th>
+<th data-quarto-table-cell-role="th">total_goals</th>
+<th data-quarto-table-cell-role="th">total_assists</th>
+<th data-quarto-table-cell-role="th">total_minutes</th>
+<th data-quarto-table-cell-role="th">total_yellow_cards</th>
+<th data-quarto-table-cell-role="th">total_red_cards</th>
+<th data-quarto-table-cell-role="th">valuation_date</th>
+<th data-quarto-table-cell-role="th">market_value_in_eur_y</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">0</th>
+<td>10</td>
+<td>Miroslav</td>
+<td>Klose</td>
+<td>Miroslav Klose</td>
+<td>2015</td>
+<td>398</td>
+<td>miroslav-klose</td>
+<td>Poland</td>
+<td>Opole</td>
+<td>Germany</td>
+<td>1978-06-09 00:00:00</td>
+<td>Centre-Forward</td>
+<td>Attack</td>
+<td>right</td>
+<td>184.0</td>
+<td>NaN</td>
+<td>ASBW Sport Marketing</td>
+<td>https://img.a.transfermarkt.technology/portrai...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>https://www.transfermarkt.co.uk/miroslav-klose...</td>
+<td>IT1</td>
+<td>Società Sportiva Lazio S.p.A.</td>
+<td>1000000.0</td>
+<td>30000000.0</td>
+<td>136.0</td>
+<td>48.0</td>
+<td>25.0</td>
+<td>8808.0</td>
+<td>19.0</td>
+<td>0.0</td>
+<td>2016-01-04</td>
+<td>1000000.0</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">1</th>
+<td>26</td>
+<td>Roman</td>
+<td>Weidenfeller</td>
+<td>Roman Weidenfeller</td>
+<td>2017</td>
+<td>16</td>
+<td>roman-weidenfeller</td>
+<td>Germany</td>
+<td>Diez</td>
+<td>Germany</td>
+<td>1980-08-06 00:00:00</td>
+<td>Goalkeeper</td>
+<td>Goalkeeper</td>
+<td>left</td>
+<td>190.0</td>
+<td>NaN</td>
+<td>Neubauer 13 GmbH</td>
+<td>https://img.a.transfermarkt.technology/portrai...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>https://www.transfermarkt.co.uk/roman-weidenfe...</td>
+<td>L1</td>
+<td>Borussia Dortmund</td>
+<td>750000.0</td>
+<td>8000000.0</td>
+<td>152.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>13508.0</td>
+<td>4.0</td>
+<td>2.0</td>
+<td>2017-12-28</td>
+<td>750000.0</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">2</th>
+<td>65</td>
+<td>Dimitar</td>
+<td>Berbatov</td>
+<td>Dimitar Berbatov</td>
+<td>2015</td>
+<td>1091</td>
+<td>dimitar-berbatov</td>
+<td>Bulgaria</td>
+<td>Blagoevgrad</td>
+<td>Bulgaria</td>
+<td>1981-01-30 00:00:00</td>
+<td>Centre-Forward</td>
+<td>Attack</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>CSKA-AS-23 Ltd.</td>
+<td>https://img.a.transfermarkt.technology/portrai...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>https://www.transfermarkt.co.uk/dimitar-berbat...</td>
+<td>GR1</td>
+<td>Panthessalonikios Athlitikos Omilos Konstantin...</td>
+<td>1000000.0</td>
+<td>34500000.0</td>
+<td>122.0</td>
+<td>38.0</td>
+<td>13.0</td>
+<td>8788.0</td>
+<td>11.0</td>
+<td>1.0</td>
+<td>2016-06-21</td>
+<td>1000000.0</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">3</th>
+<td>77</td>
+<td>NaN</td>
+<td>Lúcio</td>
+<td>Lúcio</td>
+<td>2012</td>
+<td>506</td>
+<td>lucio</td>
+<td>Brazil</td>
+<td>Brasília</td>
+<td>Brazil</td>
+<td>1978-05-08 00:00:00</td>
+<td>Centre-Back</td>
+<td>Defender</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>https://img.a.transfermarkt.technology/portrai...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>https://www.transfermarkt.co.uk/lucio/profil/s...</td>
+<td>IT1</td>
+<td>Juventus FC</td>
+<td>200000.0</td>
+<td>24500000.0</td>
+<td>4.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>307.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>2016-11-15</td>
+<td>200000.0</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">4</th>
+<td>80</td>
+<td>Tom</td>
+<td>Starke</td>
+<td>Tom Starke</td>
+<td>2017</td>
+<td>27</td>
+<td>tom-starke</td>
+<td>East Germany (GDR)</td>
+<td>Freital</td>
+<td>Germany</td>
+<td>1981-03-18 00:00:00</td>
+<td>Goalkeeper</td>
+<td>Goalkeeper</td>
+<td>right</td>
+<td>194.0</td>
+<td>NaN</td>
+<td>IFM</td>
+<td>https://img.a.transfermarkt.technology/portrai...</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>https://www.transfermarkt.co.uk/tom-starke/pro...</td>
+<td>L1</td>
+<td>Bayern Munich</td>
+<td>100000.0</td>
+<td>3000000.0</td>
+<td>12.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>1080.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>2018-06-05</td>
+<td>100000.0</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div id="c7b640f3" class="cell" data-execution_count="129">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>os.makedirs(<span class="st">'../data/processed'</span>, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>player_master.to_csv(<span class="st">'../data/processed/player_master_raw.csv'</span>, index<span class="op">=</span><span class="va">False</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="ca7ad759" class="cell" data-execution_count="130">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>missing <span class="op">=</span> player_master.isna().<span class="bu">sum</span>().sort_values(ascending<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>missing_pct <span class="op">=</span> (missing <span class="op">/</span> <span class="bu">len</span>(player_master) <span class="op">*</span> <span class="dv">100</span>).<span class="bu">round</span>(<span class="dv">1</span>)</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>pd.DataFrame({<span class="st">'missing_count'</span>: missing, <span class="st">'missing_pct'</span>: missing_pct})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="130">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">missing_count</th>
+<th data-quarto-table-cell-role="th">missing_pct</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">current_national_team_id</th>
+<td>46889</td>
+<td>93.5</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">international_goals</th>
+<td>30793</td>
+<td>61.4</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">international_caps</th>
+<td>30793</td>
+<td>61.4</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">agent_name</th>
+<td>23296</td>
+<td>46.5</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">total_goals</th>
+<td>20619</td>
+<td>41.1</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">total_games</th>
+<td>20619</td>
+<td>41.1</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">total_red_cards</th>
+<td>20619</td>
+<td>41.1</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">total_yellow_cards</th>
+<td>20619</td>
+<td>41.1</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">total_minutes</th>
+<td>20619</td>
+<td>41.1</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">total_assists</th>
+<td>20619</td>
+<td>41.1</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">contract_expiration_date</th>
+<td>18569</td>
+<td>37.0</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">highest_market_value_in_eur</th>
+<td>8621</td>
+<td>17.2</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">market_value_in_eur_y</th>
+<td>8621</td>
+<td>17.2</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">valuation_date</th>
+<td>8621</td>
+<td>17.2</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">market_value_in_eur_x</th>
+<td>8621</td>
+<td>17.2</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">foot</th>
+<td>5893</td>
+<td>11.8</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">country_of_birth</th>
+<td>5885</td>
+<td>11.7</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">city_of_birth</th>
+<td>5608</td>
+<td>11.2</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">height_in_cm</th>
+<td>4365</td>
+<td>8.7</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">first_name</th>
+<td>3164</td>
+<td>6.3</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">current_club_domestic_competition_id</th>
+<td>2986</td>
+<td>6.0</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">current_club_name</th>
+<td>2986</td>
+<td>6.0</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">sub_position</th>
+<td>586</td>
+<td>1.2</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">country_of_citizenship</th>
+<td>269</td>
+<td>0.5</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">date_of_birth</th>
+<td>49</td>
+<td>0.1</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">player_id</th>
+<td>0</td>
+<td>0.0</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">url</th>
+<td>0</td>
+<td>0.0</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">position</th>
+<td>0</td>
+<td>0.0</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">player_code</th>
+<td>0</td>
+<td>0.0</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">current_club_id</th>
+<td>0</td>
+<td>0.0</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">last_season</th>
+<td>0</td>
+<td>0.0</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">name</th>
+<td>0</td>
+<td>0.0</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">last_name</th>
+<td>0</td>
+<td>0.0</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">image_url</th>
+<td>0</td>
+<td>0.0</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div id="57b3b2d1" class="cell" data-execution_count="131">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Compare to understand the difference</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>player_master[[<span class="st">'player_id'</span>, <span class="st">'market_value_in_eur_x'</span>, <span class="st">'market_value_in_eur_y'</span>, <span class="st">'valuation_date'</span>]].sample(<span class="dv">5</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="131">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">player_id</th>
+<th data-quarto-table-cell-role="th">market_value_in_eur_x</th>
+<th data-quarto-table-cell-role="th">market_value_in_eur_y</th>
+<th data-quarto-table-cell-role="th">valuation_date</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">1274</th>
+<td>15185</td>
+<td>100000.0</td>
+<td>100000.0</td>
+<td>2026-06-04</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">49065</th>
+<td>1358226</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">8019</th>
+<td>99327</td>
+<td>200000.0</td>
+<td>200000.0</td>
+<td>2023-10-20</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">41800</th>
+<td>957653</td>
+<td>38000000.0</td>
+<td>38000000.0</td>
+<td>2026-05-28</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">42378</th>
+<td>985269</td>
+<td>1500000.0</td>
+<td>1500000.0</td>
+<td>2026-05-22</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div id="d0dbbd24" class="cell" data-execution_count="132">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>player_master <span class="op">=</span> player_master.drop(columns<span class="op">=</span>[<span class="st">'market_value_in_eur_y'</span>])</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>player_master <span class="op">=</span> player_master.rename(columns<span class="op">=</span>{<span class="st">'market_value_in_eur_x'</span>: <span class="st">'market_value_in_eur'</span>})</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>player_master.columns.tolist()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="132">
+<pre><code>['player_id',
+ 'first_name',
+ 'last_name',
+ 'name',
+ 'last_season',
+ 'current_club_id',
+ 'player_code',
+ 'country_of_birth',
+ 'city_of_birth',
+ 'country_of_citizenship',
+ 'date_of_birth',
+ 'sub_position',
+ 'position',
+ 'foot',
+ 'height_in_cm',
+ 'contract_expiration_date',
+ 'agent_name',
+ 'image_url',
+ 'international_caps',
+ 'international_goals',
+ 'current_national_team_id',
+ 'url',
+ 'current_club_domestic_competition_id',
+ 'current_club_name',
+ 'market_value_in_eur',
+ 'highest_market_value_in_eur',
+ 'total_games',
+ 'total_goals',
+ 'total_assists',
+ 'total_minutes',
+ 'total_yellow_cards',
+ 'total_red_cards',
+ 'valuation_date']</code></pre>
+</div>
+</div>
+<div id="2a925951" class="cell" data-execution_count="133">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>player_master[<span class="st">'international_caps'</span>] <span class="op">=</span> player_master[<span class="st">'international_caps'</span>].fillna(<span class="dv">0</span>)</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>player_master[<span class="st">'international_goals'</span>] <span class="op">=</span> player_master[<span class="st">'international_goals'</span>].fillna(<span class="dv">0</span>)</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>player_master_clean <span class="op">=</span> player_master.dropna(subset<span class="op">=</span>[<span class="st">'total_games'</span>]).copy()</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(player_master.shape)</span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(player_master_clean.shape)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>(50149, 33)
+(29530, 33)</code></pre>
+</div>
+</div>
+<div id="0b2ac584" class="cell" data-execution_count="134">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>player_master_clean[<span class="st">'foot'</span>] <span class="op">=</span> player_master_clean[<span class="st">'foot'</span>].fillna(<span class="st">'Unknown'</span>)</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>player_master_clean[<span class="st">'country_of_birth'</span>] <span class="op">=</span> player_master_clean[<span class="st">'country_of_birth'</span>].fillna(<span class="st">'Unknown'</span>)</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>player_master_clean[<span class="st">'height_in_cm'</span>] <span class="op">=</span> player_master_clean[<span class="st">'height_in_cm'</span>].fillna(</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>    player_master_clean[<span class="st">'height_in_cm'</span>].median()</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(player_master_clean[[<span class="st">'foot'</span>, <span class="st">'country_of_birth'</span>, <span class="st">'height_in_cm'</span>]].isna().<span class="bu">sum</span>())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>foot                0
+country_of_birth    0
+height_in_cm        0
+dtype: int64</code></pre>
+</div>
+</div>
+<div id="d8715f4b" class="cell" data-execution_count="135">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>player_master_clean <span class="op">=</span> player_master_clean.dropna(subset<span class="op">=</span>[<span class="st">'market_value_in_eur'</span>])</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(player_master_clean.shape)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>(28328, 33)</code></pre>
+</div>
+</div>
+<div id="e8575b2d" class="cell" data-execution_count="136">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>remaining_missing <span class="op">=</span> player_master_clean.isna().<span class="bu">sum</span>()</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>remaining_missing[remaining_missing <span class="op">&gt;</span> <span class="dv">0</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="136">
+<pre><code>first_name                               1948
+city_of_birth                            1158
+country_of_citizenship                    200
+date_of_birth                              21
+sub_position                               63
+contract_expiration_date                10408
+agent_name                              12496
+current_national_team_id                27404
+current_club_domestic_competition_id      700
+current_club_name                         700
+dtype: int64</code></pre>
+</div>
+</div>
+<div id="25d3a0a2" class="cell" data-execution_count="137">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>player_master_clean[<span class="st">'first_name'</span>] <span class="op">=</span> player_master_clean[<span class="st">'first_name'</span>].fillna(<span class="st">'Unknown'</span>)</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>player_master_clean[<span class="st">'city_of_birth'</span>] <span class="op">=</span> player_master_clean[<span class="st">'city_of_birth'</span>].fillna(<span class="st">'Unknown'</span>)</span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>player_master_clean[<span class="st">'country_of_citizenship'</span>] <span class="op">=</span> player_master_clean[<span class="st">'country_of_citizenship'</span>].fillna(<span class="st">'Unknown'</span>)</span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>player_master_clean[<span class="st">'sub_position'</span>] <span class="op">=</span> player_master_clean[<span class="st">'sub_position'</span>].fillna(<span class="st">'Unknown'</span>)</span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>player_master_clean <span class="op">=</span> player_master_clean.dropna(subset<span class="op">=</span>[<span class="st">'date_of_birth'</span>])</span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>player_master_clean <span class="op">=</span> player_master_clean.dropna(subset<span class="op">=</span>[<span class="st">'current_club_name'</span>])</span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(player_master_clean.shape)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>(27607, 33)</code></pre>
+</div>
+</div>
+<div id="2ebb6f3c" class="cell" data-execution_count="138">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>player_master_clean[[<span class="st">'height_in_cm'</span>, <span class="st">'market_value_in_eur'</span>, <span class="st">'total_goals'</span>, <span class="st">'total_minutes'</span>]].describe()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="138">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">height_in_cm</th>
+<th data-quarto-table-cell-role="th">market_value_in_eur</th>
+<th data-quarto-table-cell-role="th">total_goals</th>
+<th data-quarto-table-cell-role="th">total_minutes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">count</th>
+<td>27607.000000</td>
+<td>2.760700e+04</td>
+<td>27607.000000</td>
+<td>27607.000000</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">mean</th>
+<td>182.214728</td>
+<td>2.017578e+06</td>
+<td>6.428442</td>
+<td>4633.927917</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">std</th>
+<td>6.726380</td>
+<td>7.085582e+06</td>
+<td>17.229206</td>
+<td>6560.089878</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">min</th>
+<td>18.000000</td>
+<td>1.000000e+04</td>
+<td>0.000000</td>
+<td>1.000000</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">25%</th>
+<td>178.000000</td>
+<td>1.500000e+05</td>
+<td>0.000000</td>
+<td>333.000000</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">50%</th>
+<td>182.000000</td>
+<td>3.000000e+05</td>
+<td>1.000000</td>
+<td>1873.000000</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">75%</th>
+<td>187.000000</td>
+<td>1.000000e+06</td>
+<td>5.000000</td>
+<td>6309.000000</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">max</th>
+<td>207.000000</td>
+<td>2.000000e+08</td>
+<td>528.000000</td>
+<td>54203.000000</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div id="52ed2348" class="cell" data-execution_count="139">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="co"># suspicious short/tall entries</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>player_master_clean[player_master_clean[<span class="st">'height_in_cm'</span>] <span class="op">&lt;</span> <span class="dv">140</span>][[<span class="st">'name'</span>, <span class="st">'height_in_cm'</span>, <span class="st">'position'</span>]]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="139">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">name</th>
+<th data-quarto-table-cell-role="th">height_in_cm</th>
+<th data-quarto-table-cell-role="th">position</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">36706</th>
+<td>Connor Allan</td>
+<td>19.0</td>
+<td>Defender</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">43301</th>
+<td>Eugene Amankwah</td>
+<td>18.0</td>
+<td>Defender</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div id="245665ea" class="cell" data-execution_count="140">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb38"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>median_height <span class="op">=</span> player_master_clean[<span class="st">'height_in_cm'</span>].median()</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>player_master_clean.loc[player_master_clean[<span class="st">'height_in_cm'</span>] <span class="op">&lt;</span> <span class="dv">140</span>, <span class="st">'height_in_cm'</span>] <span class="op">=</span> median_height</span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>player_master_clean[<span class="st">'height_in_cm'</span>].describe()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="140">
+<pre><code>count    27607.000000
+mean       182.226573
+std          6.580444
+min        159.000000
+25%        178.000000
+50%        182.000000
+75%        187.000000
+max        207.000000
+Name: height_in_cm, dtype: float64</code></pre>
+</div>
+</div>
+<div id="fd2648ff" class="cell" data-execution_count="141">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb40"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>player_master_clean.to_csv(<span class="st">'../data/processed/player_master_clean.csv'</span>, index<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Saved:"</span>, player_master_clean.shape)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Saved: (27607, 33)</code></pre>
+</div>
+</div>
+<div id="12fc9a42" class="cell" data-execution_count="142">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb42"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>os.makedirs(<span class="st">'../images'</span>, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">5</span>))</span>
+<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a>sns.histplot(player_master_clean[<span class="st">'market_value_in_eur'</span>], bins<span class="op">=</span><span class="dv">50</span>, log_scale<span class="op">=</span><span class="va">True</span>, ax<span class="op">=</span>ax)</span>
+<span id="cb42-8"><a href="#cb42-8" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">'Distribution of Player Market Values'</span>)</span>
+<span id="cb42-9"><a href="#cb42-9" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="st">'Market Value (EUR)'</span>)</span>
+<span id="cb42-10"><a href="#cb42-10" aria-hidden="true" tabindex="-1"></a>ax.set_ylabel(<span class="st">'Number of Players'</span>)</span>
+<span id="cb42-11"><a href="#cb42-11" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb42-12"><a href="#cb42-12" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">'../images/01_market_value_distribution.png'</span>, dpi<span class="op">=</span><span class="dv">150</span>)</span>
+<span id="cb42-13"><a href="#cb42-13" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="01_data_exploration_files/figure-html/cell-27-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="53984821" class="cell" data-execution_count="143">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb43"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">9</span>, <span class="dv">5</span>))</span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>sns.boxplot(data<span class="op">=</span>player_master_clean, x<span class="op">=</span><span class="st">'position'</span>, y<span class="op">=</span><span class="st">'market_value_in_eur'</span>, ax<span class="op">=</span>ax, color<span class="op">=</span><span class="st">'lightgreen'</span>)</span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>ax.set_yscale(<span class="st">'log'</span>)</span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">'Market Value by Position'</span>)</span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="st">'Position'</span>)</span>
+<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a>ax.set_ylabel(<span class="st">'Market Value (EUR)'</span>)</span>
+<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a>plt.xticks(rotation<span class="op">=</span><span class="dv">30</span>, ha<span class="op">=</span><span class="st">'right'</span>)</span>
+<span id="cb43-8"><a href="#cb43-8" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb43-9"><a href="#cb43-9" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">'../images/02_value_by_position.png'</span>, dpi<span class="op">=</span><span class="dv">150</span>)</span>
+<span id="cb43-10"><a href="#cb43-10" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="01_data_exploration_files/figure-html/cell-28-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="3771e9f5" class="cell" data-execution_count="144">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb44"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>player_master_clean[<span class="st">'position'</span>].value_counts()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="144">
+<pre><code>position
+Defender      8864
+Attack        8197
+Midfield      8197
+Goalkeeper    2287
+Missing         62
+Name: count, dtype: int64</code></pre>
+</div>
+</div>
+<div id="ebbeb4ba" class="cell" data-execution_count="145">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb46"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>player_master_clean[<span class="st">'date_of_birth'</span>] <span class="op">=</span> pd.to_datetime(player_master_clean[<span class="st">'date_of_birth'</span>])</span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>player_master_clean[<span class="st">'age'</span>] <span class="op">=</span> (pd.Timestamp(<span class="st">'2026-09-18'</span>) <span class="op">-</span> player_master_clean[<span class="st">'date_of_birth'</span>]).dt.days <span class="op">//</span> <span class="dv">365</span></span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">5</span>))</span>
+<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a>sns.scatterplot(data<span class="op">=</span>player_master_clean, x<span class="op">=</span><span class="st">'age'</span>, y<span class="op">=</span><span class="st">'market_value_in_eur'</span>, alpha<span class="op">=</span><span class="fl">0.3</span>, ax<span class="op">=</span>ax, color<span class="op">=</span><span class="st">'orange'</span>)</span>
+<span id="cb46-6"><a href="#cb46-6" aria-hidden="true" tabindex="-1"></a>ax.set_yscale(<span class="st">'log'</span>)</span>
+<span id="cb46-7"><a href="#cb46-7" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">'Player Age vs. Market Value'</span>)</span>
+<span id="cb46-8"><a href="#cb46-8" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="st">'Age'</span>)</span>
+<span id="cb46-9"><a href="#cb46-9" aria-hidden="true" tabindex="-1"></a>ax.set_ylabel(<span class="st">'Market Value (EUR)'</span>)</span>
+<span id="cb46-10"><a href="#cb46-10" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb46-11"><a href="#cb46-11" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">'../images/03_age_vs_value.png'</span>, dpi<span class="op">=</span><span class="dv">150</span>)</span>
+<span id="cb46-12"><a href="#cb46-12" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="01_data_exploration_files/figure-html/cell-30-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="87aa768f" class="cell" data-execution_count="146">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb47"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">5</span>))</span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>sns.scatterplot(data<span class="op">=</span>player_master_clean, x<span class="op">=</span><span class="st">'total_goals'</span>, y<span class="op">=</span><span class="st">'total_assists'</span>, hue<span class="op">=</span><span class="st">'position'</span>, alpha<span class="op">=</span><span class="fl">0.5</span>, ax<span class="op">=</span>ax)</span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">'Career Goals vs. Assists by Position'</span>)</span>
+<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="st">'Total Goals'</span>)</span>
+<span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a>ax.set_ylabel(<span class="st">'Total Assists'</span>)</span>
+<span id="cb47-6"><a href="#cb47-6" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb47-7"><a href="#cb47-7" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">'../images/04_goals_vs_assists.png'</span>, dpi<span class="op">=</span><span class="dv">150</span>)</span>
+<span id="cb47-8"><a href="#cb47-8" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="01_data_exploration_files/figure-html/cell-31-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="0e02b23a" class="cell" data-execution_count="167">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb48"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>top_clubs <span class="op">=</span> (player_master_clean.groupby(<span class="st">'current_club_name'</span>)[<span class="st">'market_value_in_eur'</span>]</span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a>             .mean().sort_values(ascending<span class="op">=</span><span class="va">False</span>).head(<span class="dv">10</span>))</span>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">9</span>, <span class="dv">5</span>))</span>
+<span id="cb48-5"><a href="#cb48-5" aria-hidden="true" tabindex="-1"></a>top_clubs.plot(kind<span class="op">=</span><span class="st">'barh'</span>, ax<span class="op">=</span>ax, color<span class="op">=</span><span class="st">'brown'</span>)</span>
+<span id="cb48-6"><a href="#cb48-6" aria-hidden="true" tabindex="-1"></a>ax.invert_yaxis()</span>
+<span id="cb48-7"><a href="#cb48-7" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">'Top 10 Clubs by Average Player Market Value'</span>)</span>
+<span id="cb48-8"><a href="#cb48-8" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="st">'Average Market Value (EUR)'</span>)</span>
+<span id="cb48-9"><a href="#cb48-9" aria-hidden="true" tabindex="-1"></a>ax.set_ylabel(<span class="st">'Club'</span>)</span>
+<span id="cb48-10"><a href="#cb48-10" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb48-11"><a href="#cb48-11" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">'../images/05_top_clubs_by_value.png'</span>, dpi<span class="op">=</span><span class="dv">150</span>)</span>
+<span id="cb48-12"><a href="#cb48-12" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="01_data_exploration_files/figure-html/cell-32-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="b7f51e57" class="cell" data-execution_count="148">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb49"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">7</span>, <span class="dv">5</span>))</span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>sns.barplot(data<span class="op">=</span>player_master_clean, x<span class="op">=</span><span class="st">'foot'</span>, y<span class="op">=</span><span class="st">'market_value_in_eur'</span>, ax<span class="op">=</span>ax, estimator<span class="op">=</span><span class="st">'mean'</span>)</span>
+<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">'Average Market Value by Preferred Foot'</span>)</span>
+<span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="st">'Preferred Foot'</span>)</span>
+<span id="cb49-5"><a href="#cb49-5" aria-hidden="true" tabindex="-1"></a>ax.set_ylabel(<span class="st">'Average Market Value (EUR)'</span>)</span>
+<span id="cb49-6"><a href="#cb49-6" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb49-7"><a href="#cb49-7" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">'../images/06_value_by_foot.png'</span>, dpi<span class="op">=</span><span class="dv">150</span>)</span>
+<span id="cb49-8"><a href="#cb49-8" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="01_data_exploration_files/figure-html/cell-33-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="290c4bc3" class="cell" data-execution_count="149">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb50"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>corr_cols <span class="op">=</span> [<span class="st">'age'</span>, <span class="st">'height_in_cm'</span>, <span class="st">'total_games'</span>, <span class="st">'total_goals'</span>, <span class="st">'total_assists'</span>,</span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a>             <span class="st">'total_minutes'</span>, <span class="st">'market_value_in_eur'</span>, <span class="st">'international_caps'</span>]</span>
+<span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a>corr_matrix <span class="op">=</span> player_master_clean[corr_cols].corr()</span>
+<span id="cb50-4"><a href="#cb50-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-5"><a href="#cb50-5" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">6</span>))</span>
+<span id="cb50-6"><a href="#cb50-6" aria-hidden="true" tabindex="-1"></a>sns.heatmap(corr_matrix, annot<span class="op">=</span><span class="va">True</span>, fmt<span class="op">=</span><span class="st">'.2f'</span>, cmap<span class="op">=</span><span class="st">'coolwarm'</span>, center<span class="op">=</span><span class="dv">0</span>, ax<span class="op">=</span>ax)</span>
+<span id="cb50-7"><a href="#cb50-7" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">'Correlation Between Key Player Metrics'</span>)</span>
+<span id="cb50-8"><a href="#cb50-8" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb50-9"><a href="#cb50-9" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">'../images/07_correlation_heatmap.png'</span>, dpi<span class="op">=</span><span class="dv">150</span>)</span>
+<span id="cb50-10"><a href="#cb50-10" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="01_data_exploration_files/figure-html/cell-34-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="15480c97" class="cell" data-execution_count="150">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb51"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a>top_nations <span class="op">=</span> player_master_clean[<span class="st">'country_of_citizenship'</span>].value_counts().head(<span class="dv">15</span>)</span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">9</span>, <span class="dv">5</span>))</span>
+<span id="cb51-4"><a href="#cb51-4" aria-hidden="true" tabindex="-1"></a>top_nations.plot(kind<span class="op">=</span><span class="st">'barh'</span>, ax<span class="op">=</span>ax, color<span class="op">=</span><span class="st">'seagreen'</span>)</span>
+<span id="cb51-5"><a href="#cb51-5" aria-hidden="true" tabindex="-1"></a>ax.invert_yaxis()</span>
+<span id="cb51-6"><a href="#cb51-6" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">'Top 15 Nationalities by Player Count'</span>)</span>
+<span id="cb51-7"><a href="#cb51-7" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="st">'Number of Players'</span>)</span>
+<span id="cb51-8"><a href="#cb51-8" aria-hidden="true" tabindex="-1"></a>ax.set_ylabel(<span class="st">'Nationality'</span>)</span>
+<span id="cb51-9"><a href="#cb51-9" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb51-10"><a href="#cb51-10" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">'../images/08_top_nationalities.png'</span>, dpi<span class="op">=</span><span class="dv">150</span>)</span>
+<span id="cb51-11"><a href="#cb51-11" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="01_data_exploration_files/figure-html/cell-35-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="83a2b652" class="cell" data-execution_count="175">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb52"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">5</span>))</span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a>sns.scatterplot(data<span class="op">=</span>player_master_clean, x<span class="op">=</span><span class="st">'international_caps'</span>, y<span class="op">=</span><span class="st">'market_value_in_eur'</span>, alpha<span class="op">=</span><span class="fl">0.3</span>, ax<span class="op">=</span>ax, color<span class="op">=</span><span class="st">"lightcoral"</span>)</span>
+<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a>ax.set_yscale(<span class="st">'log'</span>)</span>
+<span id="cb52-4"><a href="#cb52-4" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">'International Caps vs. Market Value'</span>)</span>
+<span id="cb52-5"><a href="#cb52-5" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="st">'International Caps'</span>)</span>
+<span id="cb52-6"><a href="#cb52-6" aria-hidden="true" tabindex="-1"></a>ax.set_ylabel(<span class="st">'Market Value (EUR)'</span>)</span>
+<span id="cb52-7"><a href="#cb52-7" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb52-8"><a href="#cb52-8" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">'../images/09_caps_vs_value.png'</span>, dpi<span class="op">=</span><span class="dv">150</span>)</span>
+<span id="cb52-9"><a href="#cb52-9" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="01_data_exploration_files/figure-html/cell-36-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="b3476e1f" class="cell" data-execution_count="173">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb53"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">5</span>))</span>
+<span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a>sns.histplot(player_master_clean[<span class="st">'age'</span>], bins<span class="op">=</span><span class="dv">30</span>, kde<span class="op">=</span><span class="va">True</span>, ax<span class="op">=</span>ax)</span>
+<span id="cb53-3"><a href="#cb53-3" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">'Distribution of Player Ages'</span>)</span>
+<span id="cb53-4"><a href="#cb53-4" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="st">'Age'</span>)</span>
+<span id="cb53-5"><a href="#cb53-5" aria-hidden="true" tabindex="-1"></a>ax.set_ylabel(<span class="st">'Number of Players'</span>)</span>
+<span id="cb53-6"><a href="#cb53-6" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb53-7"><a href="#cb53-7" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">'../images/10_age_distribution.png'</span>, dpi<span class="op">=</span><span class="dv">150</span>)</span>
+<span id="cb53-8"><a href="#cb53-8" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="01_data_exploration_files/figure-html/cell-37-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="505f3879" class="cell" data-execution_count="155">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb54"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a>raw_preview_cols <span class="op">=</span> [<span class="st">'player_id'</span>, <span class="st">'name'</span>, <span class="st">'position'</span>, <span class="st">'sub_position'</span>, <span class="st">'height_in_cm'</span>, <span class="st">'foot'</span>,</span>
+<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a>                     <span class="st">'country_of_citizenship'</span>, <span class="st">'current_club_name'</span>,</span>
+<span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a>                     <span class="st">'total_games'</span>, <span class="st">'total_goals'</span>, <span class="st">'total_assists'</span>, <span class="st">'total_minutes'</span>,</span>
+<span id="cb54-4"><a href="#cb54-4" aria-hidden="true" tabindex="-1"></a>                     <span class="st">'total_yellow_cards'</span>, <span class="st">'total_red_cards'</span>,</span>
+<span id="cb54-5"><a href="#cb54-5" aria-hidden="true" tabindex="-1"></a>                     <span class="st">'international_caps'</span>, <span class="st">'international_goals'</span>,</span>
+<span id="cb54-6"><a href="#cb54-6" aria-hidden="true" tabindex="-1"></a>                     <span class="st">'market_value_in_eur_x'</span>, <span class="st">'highest_market_value_in_eur'</span>]</span>
+<span id="cb54-7"><a href="#cb54-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-8"><a href="#cb54-8" aria-hidden="true" tabindex="-1"></a>clean_preview_cols <span class="op">=</span> [<span class="st">'player_id'</span>, <span class="st">'name'</span>, <span class="st">'position'</span>, <span class="st">'sub_position'</span>, <span class="st">'height_in_cm'</span>, <span class="st">'foot'</span>,</span>
+<span id="cb54-9"><a href="#cb54-9" aria-hidden="true" tabindex="-1"></a>                       <span class="st">'country_of_citizenship'</span>, <span class="st">'current_club_name'</span>,</span>
+<span id="cb54-10"><a href="#cb54-10" aria-hidden="true" tabindex="-1"></a>                       <span class="st">'total_games'</span>, <span class="st">'total_goals'</span>, <span class="st">'total_assists'</span>, <span class="st">'total_minutes'</span>,</span>
+<span id="cb54-11"><a href="#cb54-11" aria-hidden="true" tabindex="-1"></a>                       <span class="st">'total_yellow_cards'</span>, <span class="st">'total_red_cards'</span>,</span>
+<span id="cb54-12"><a href="#cb54-12" aria-hidden="true" tabindex="-1"></a>                       <span class="st">'international_caps'</span>, <span class="st">'international_goals'</span>,</span>
+<span id="cb54-13"><a href="#cb54-13" aria-hidden="true" tabindex="-1"></a>                       <span class="st">'market_value_in_eur'</span>, <span class="st">'highest_market_value_in_eur'</span>, <span class="st">'age'</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="2b45dfec" class="cell" data-execution_count="162">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb55"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a>player_master_raw[raw_preview_cols].head(<span class="dv">11</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="162">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">player_id</th>
+<th data-quarto-table-cell-role="th">name</th>
+<th data-quarto-table-cell-role="th">position</th>
+<th data-quarto-table-cell-role="th">sub_position</th>
+<th data-quarto-table-cell-role="th">height_in_cm</th>
+<th data-quarto-table-cell-role="th">foot</th>
+<th data-quarto-table-cell-role="th">country_of_citizenship</th>
+<th data-quarto-table-cell-role="th">current_club_name</th>
+<th data-quarto-table-cell-role="th">total_games</th>
+<th data-quarto-table-cell-role="th">total_goals</th>
+<th data-quarto-table-cell-role="th">total_assists</th>
+<th data-quarto-table-cell-role="th">total_minutes</th>
+<th data-quarto-table-cell-role="th">total_yellow_cards</th>
+<th data-quarto-table-cell-role="th">total_red_cards</th>
+<th data-quarto-table-cell-role="th">international_caps</th>
+<th data-quarto-table-cell-role="th">international_goals</th>
+<th data-quarto-table-cell-role="th">market_value_in_eur_x</th>
+<th data-quarto-table-cell-role="th">highest_market_value_in_eur</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">0</th>
+<td>10</td>
+<td>Miroslav Klose</td>
+<td>Attack</td>
+<td>Centre-Forward</td>
+<td>184.0</td>
+<td>right</td>
+<td>Germany</td>
+<td>Società Sportiva Lazio S.p.A.</td>
+<td>136.0</td>
+<td>48.0</td>
+<td>25.0</td>
+<td>8808.0</td>
+<td>19.0</td>
+<td>0.0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>1000000.0</td>
+<td>30000000.0</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">1</th>
+<td>26</td>
+<td>Roman Weidenfeller</td>
+<td>Goalkeeper</td>
+<td>Goalkeeper</td>
+<td>190.0</td>
+<td>left</td>
+<td>Germany</td>
+<td>Borussia Dortmund</td>
+<td>152.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>13508.0</td>
+<td>4.0</td>
+<td>2.0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>750000.0</td>
+<td>8000000.0</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">2</th>
+<td>65</td>
+<td>Dimitar Berbatov</td>
+<td>Attack</td>
+<td>Centre-Forward</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>Bulgaria</td>
+<td>Panthessalonikios Athlitikos Omilos Konstantin...</td>
+<td>122.0</td>
+<td>38.0</td>
+<td>13.0</td>
+<td>8788.0</td>
+<td>11.0</td>
+<td>1.0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>1000000.0</td>
+<td>34500000.0</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">3</th>
+<td>77</td>
+<td>Lúcio</td>
+<td>Defender</td>
+<td>Centre-Back</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>Brazil</td>
+<td>Juventus FC</td>
+<td>4.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>307.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>200000.0</td>
+<td>24500000.0</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">4</th>
+<td>80</td>
+<td>Tom Starke</td>
+<td>Goalkeeper</td>
+<td>Goalkeeper</td>
+<td>194.0</td>
+<td>right</td>
+<td>Germany</td>
+<td>Bayern Munich</td>
+<td>12.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>1080.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>100000.0</td>
+<td>3000000.0</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">5</th>
+<td>109</td>
+<td>Dedê</td>
+<td>Defender</td>
+<td>Left-Back</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>Brazil</td>
+<td>Eskisehirspor</td>
+<td>41.0</td>
+<td>1.0</td>
+<td>2.0</td>
+<td>3584.0</td>
+<td>4.0</td>
+<td>0.0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>400000.0</td>
+<td>9500000.0</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">6</th>
+<td>123</td>
+<td>Christoph Metzelder</td>
+<td>Defender</td>
+<td>Centre-Back</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>Germany</td>
+<td>FC Schalke 04</td>
+<td>7.0</td>
+<td>0.0</td>
+<td>1.0</td>
+<td>427.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>1500000.0</td>
+<td>9500000.0</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">7</th>
+<td>132</td>
+<td>Tomas Rosicky</td>
+<td>Midfield</td>
+<td>Attacking Midfield</td>
+<td>179.0</td>
+<td>both</td>
+<td>Czech Republic</td>
+<td>Arsenal FC</td>
+<td>77.0</td>
+<td>9.0</td>
+<td>4.0</td>
+<td>3987.0</td>
+<td>13.0</td>
+<td>0.0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>350000.0</td>
+<td>17500000.0</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">8</th>
+<td>162</td>
+<td>Marc Ziegler</td>
+<td>Goalkeeper</td>
+<td>Goalkeeper</td>
+<td>193.0</td>
+<td>right</td>
+<td>Germany</td>
+<td>VfB Stuttgart</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>200000.0</td>
+<td>1250000.0</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">9</th>
+<td>215</td>
+<td>Roque Santa Cruz</td>
+<td>Attack</td>
+<td>Centre-Forward</td>
+<td>193.0</td>
+<td>right</td>
+<td>Paraguay</td>
+<td>Málaga CF</td>
+<td>109.0</td>
+<td>26.0</td>
+<td>8.0</td>
+<td>6038.0</td>
+<td>3.0</td>
+<td>0.0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>250000.0</td>
+<td>12000000.0</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">10</th>
+<td>258</td>
+<td>Gerald Asamoah</td>
+<td>Attack</td>
+<td>Centre-Forward</td>
+<td>180.0</td>
+<td>right</td>
+<td>Germany</td>
+<td>FC Schalke 04</td>
+<td>19.0</td>
+<td>0.0</td>
+<td>2.0</td>
+<td>1075.0</td>
+<td>2.0</td>
+<td>0.0</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>100000.0</td>
+<td>7000000.0</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div id="f7cb59ae" class="cell" data-execution_count="161">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb56"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a>player_master_clean[clean_preview_cols].head(<span class="dv">10</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="161">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">player_id</th>
+<th data-quarto-table-cell-role="th">name</th>
+<th data-quarto-table-cell-role="th">position</th>
+<th data-quarto-table-cell-role="th">sub_position</th>
+<th data-quarto-table-cell-role="th">height_in_cm</th>
+<th data-quarto-table-cell-role="th">foot</th>
+<th data-quarto-table-cell-role="th">country_of_citizenship</th>
+<th data-quarto-table-cell-role="th">current_club_name</th>
+<th data-quarto-table-cell-role="th">total_games</th>
+<th data-quarto-table-cell-role="th">total_goals</th>
+<th data-quarto-table-cell-role="th">total_assists</th>
+<th data-quarto-table-cell-role="th">total_minutes</th>
+<th data-quarto-table-cell-role="th">total_yellow_cards</th>
+<th data-quarto-table-cell-role="th">total_red_cards</th>
+<th data-quarto-table-cell-role="th">international_caps</th>
+<th data-quarto-table-cell-role="th">international_goals</th>
+<th data-quarto-table-cell-role="th">market_value_in_eur</th>
+<th data-quarto-table-cell-role="th">highest_market_value_in_eur</th>
+<th data-quarto-table-cell-role="th">age</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">0</th>
+<td>10</td>
+<td>Miroslav Klose</td>
+<td>Attack</td>
+<td>Centre-Forward</td>
+<td>184.0</td>
+<td>right</td>
+<td>Germany</td>
+<td>Società Sportiva Lazio S.p.A.</td>
+<td>136.0</td>
+<td>48.0</td>
+<td>25.0</td>
+<td>8808.0</td>
+<td>19.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>1000000.0</td>
+<td>30000000.0</td>
+<td>48</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">1</th>
+<td>26</td>
+<td>Roman Weidenfeller</td>
+<td>Goalkeeper</td>
+<td>Goalkeeper</td>
+<td>190.0</td>
+<td>left</td>
+<td>Germany</td>
+<td>Borussia Dortmund</td>
+<td>152.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>13508.0</td>
+<td>4.0</td>
+<td>2.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>750000.0</td>
+<td>8000000.0</td>
+<td>46</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">2</th>
+<td>65</td>
+<td>Dimitar Berbatov</td>
+<td>Attack</td>
+<td>Centre-Forward</td>
+<td>182.0</td>
+<td>Unknown</td>
+<td>Bulgaria</td>
+<td>Panthessalonikios Athlitikos Omilos Konstantin...</td>
+<td>122.0</td>
+<td>38.0</td>
+<td>13.0</td>
+<td>8788.0</td>
+<td>11.0</td>
+<td>1.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>1000000.0</td>
+<td>34500000.0</td>
+<td>45</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">3</th>
+<td>77</td>
+<td>Lúcio</td>
+<td>Defender</td>
+<td>Centre-Back</td>
+<td>182.0</td>
+<td>Unknown</td>
+<td>Brazil</td>
+<td>Juventus FC</td>
+<td>4.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>307.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>200000.0</td>
+<td>24500000.0</td>
+<td>48</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">4</th>
+<td>80</td>
+<td>Tom Starke</td>
+<td>Goalkeeper</td>
+<td>Goalkeeper</td>
+<td>194.0</td>
+<td>right</td>
+<td>Germany</td>
+<td>Bayern Munich</td>
+<td>12.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>1080.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>100000.0</td>
+<td>3000000.0</td>
+<td>45</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">5</th>
+<td>109</td>
+<td>Dedê</td>
+<td>Defender</td>
+<td>Left-Back</td>
+<td>182.0</td>
+<td>Unknown</td>
+<td>Brazil</td>
+<td>Eskisehirspor</td>
+<td>41.0</td>
+<td>1.0</td>
+<td>2.0</td>
+<td>3584.0</td>
+<td>4.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>400000.0</td>
+<td>9500000.0</td>
+<td>48</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">6</th>
+<td>123</td>
+<td>Christoph Metzelder</td>
+<td>Defender</td>
+<td>Centre-Back</td>
+<td>182.0</td>
+<td>Unknown</td>
+<td>Germany</td>
+<td>FC Schalke 04</td>
+<td>7.0</td>
+<td>0.0</td>
+<td>1.0</td>
+<td>427.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>1500000.0</td>
+<td>9500000.0</td>
+<td>45</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">7</th>
+<td>132</td>
+<td>Tomas Rosicky</td>
+<td>Midfield</td>
+<td>Attacking Midfield</td>
+<td>179.0</td>
+<td>both</td>
+<td>Czech Republic</td>
+<td>Arsenal FC</td>
+<td>77.0</td>
+<td>9.0</td>
+<td>4.0</td>
+<td>3987.0</td>
+<td>13.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>350000.0</td>
+<td>17500000.0</td>
+<td>45</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">9</th>
+<td>215</td>
+<td>Roque Santa Cruz</td>
+<td>Attack</td>
+<td>Centre-Forward</td>
+<td>193.0</td>
+<td>right</td>
+<td>Paraguay</td>
+<td>Málaga CF</td>
+<td>109.0</td>
+<td>26.0</td>
+<td>8.0</td>
+<td>6038.0</td>
+<td>3.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>250000.0</td>
+<td>12000000.0</td>
+<td>45</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">10</th>
+<td>258</td>
+<td>Gerald Asamoah</td>
+<td>Attack</td>
+<td>Centre-Forward</td>
+<td>180.0</td>
+<td>right</td>
+<td>Germany</td>
+<td>FC Schalke 04</td>
+<td>19.0</td>
+<td>0.0</td>
+<td>2.0</td>
+<td>1075.0</td>
+<td>2.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>100000.0</td>
+<td>7000000.0</td>
+<td>47</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+
+
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

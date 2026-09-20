@@ -1,0 +1,36 @@
+project:
+  type: website
+
+website:
+  title: "Soccer Player Performance and Valuation Analytics"
+  navbar:
+    left:
+      - href: index.qmd
+        text: Introduction
+      - href: dataprep_eda.qmd
+        text: Data Prep & EDA
+      - href: clustering.qmd
+        text: Clustering
+      - href: pca.qmd
+        text: PCA
+      - href: naivebayes.qmd
+        text: Naive Bayes
+      - href: dectrees.qmd
+        text: Decision Trees
+      - href: svms.qmd
+        text: SVM
+      - href: regression.qmd
+        text: Regression
+      - href: nn.qmd
+        text: Neural Networks
+      - href: conclusions.qmd
+        text: Conclusion
+
+format:
+  html:
+    theme: cosmo
+    css: styles.css
+    toc: true
+
+
+
