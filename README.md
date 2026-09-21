@@ -20,20 +20,21 @@ This project explores player performance, physical attributes, and career data t
 - **GitHub Pages** — site hosting/deployment
 
 ## Project Structure
-├── index.qmd # Introduction
-├── dataprep_eda.qmd # Data collection, cleaning, and exploratory analysis
-├── clustering.qmd # Clustering analysis
-├── pca.qmd # Principal Component Analysis
-├── naivebayes.qmd # Naive Bayes classification
-├── dectrees.qmd # Decision Trees
-├── svms.qmd # Support Vector Machines
-├── regression.qmd # Regression modeling
-├── nn.qmd # Neural Networks
-├── conclusions.qmd # Final conclusions
-├── notebooks/ # Jupyter notebooks with data processing code
-├── images/ # Visualizations and data preview images
-├── data/api_raw/ # Saved API pull outputs
-└── _quarto.yml # Site configuration and navigation
+
+- `index.qmd` — Introduction
+- `dataprep_eda.qmd` — Data collection, cleaning, and exploratory analysis
+- `clustering.qmd` — Clustering analysis
+- `pca.qmd` — Principal Component Analysis
+- `naivebayes.qmd` — Naive Bayes classification
+- `dectrees.qmd` — Decision Trees
+- `svms.qmd` — Support Vector Machines
+- `regression.qmd` — Regression modeling
+- `nn.qmd` — Neural Networks
+- `conclusions.qmd` — Final conclusions
+- `notebooks/` — Jupyter notebooks with data processing code
+- `images/` — Visualizations and data preview images
+- `data/api_raw/` — Saved API pull outputs
+- `_quarto.yml` — Site configuration and navigation
 
 
 Note: raw and processed datasets are excluded from this repository via `.gitignore` due to file size — see the Data Sources section above and the DataPrep_EDA page on the live site for direct links.
