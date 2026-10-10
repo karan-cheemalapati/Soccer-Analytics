@@ -27,9 +27,10 @@ This project explores player performance, physical attributes, and career data t
 - `pca.qmd` — Principal Component Analysis
 - `naivebayes.qmd` — Naive Bayes classification
 - `dectrees.qmd` — Decision Trees
-- `svms.qmd` — Support Vector Machines
 - `regression.qmd` — Regression modeling
-- `nn.qmd` — Neural Networks
+- `adaboost.qmd` — AdaBoost
+- `gradientboost.qmd` — Gradient Boosting
+- `xgboost.qmd` — XGBoost
 - `conclusions.qmd` — Final conclusions
 - `notebooks/` — Jupyter notebooks with data processing code
 - `images/` — Visualizations and data preview images
