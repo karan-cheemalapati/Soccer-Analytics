@@ -1,5 +1,5 @@
 ---
-title: "SVM"
+title: "Gradient Boosting"
 ---
 
 Content coming soon.

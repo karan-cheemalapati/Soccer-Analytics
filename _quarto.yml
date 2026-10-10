@@ -17,12 +17,14 @@ website:
         text: Naive Bayes
       - href: dectrees.qmd
         text: Decision Trees
-      - href: svms.qmd
-        text: SVM
       - href: regression.qmd
         text: Regression
-      - href: nn.qmd
-        text: Neural Networks
+      - href: adaboost.qmd
+        text: AdaBoost
+      - href: gradientboost.qmd
+        text: Gradient Boosting
+      - href: xgboost.qmd
+        text: XGBoost
       - href: conclusions.qmd
         text: Conclusion
 
