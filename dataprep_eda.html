@@ -120,16 +120,20 @@ ul.task-list li input[type="checkbox"] {
 <span class="menu-text">Decision Trees</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./svms.html"> 
-<span class="menu-text">SVM</span></a>
-  </li>  
-  <li class="nav-item">
     <a class="nav-link" href="./regression.html"> 
 <span class="menu-text">Regression</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./nn.html"> 
-<span class="menu-text">Neural Networks</span></a>
+    <a class="nav-link" href="./adaboost.html"> 
+<span class="menu-text">AdaBoost</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./gradientboost.html"> 
+<span class="menu-text">Gradient Boosting</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./xgboost.html"> 
+<span class="menu-text">XGBoost</span></a>
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="./conclusions.html"> 
@@ -182,7 +186,7 @@ ul.task-list li input[type="checkbox"] {
 
 <section id="data-collection" class="level2">
 <h2 class="anchored" data-anchor-id="data-collection">Data Collection</h2>
-<p>Data for this project comes from two sources. The primary dataset is a large, regularly updated collection of European soccer data covering player profiles, appearances, and market valuations, downloaded from Kaggle. It provided detailed player-level information - including position, physical attributes, career statistics, and valuation history - spanning tens of thousands of professional players. This was supplemented with data pulled directly from the <em>football-data.org</em> API, which provides live standings and match information for major competitions, adding current-season context alongside the historical player data. An additional attribute, player age, was also engineered from each player’s date of birth to support later analysis, since age was not directly available as a standalone field in the original data.</p>
+<p>Data for this project comes from two sources. The primary dataset is a large, regularly updated collection of European soccer data covering player profiles, appearances, and market valuations, downloaded from Kaggle. It provided detailed player-level information - including position, physical attributes, career statistics, and valuation history - spanning tens of thousands of professional players. This was supplemented with data pulled directly from the <em>football-data.org</em> API, which provides live standings and match information for major competitions, adding current-season context alongside the historical player data. Player age was also added as a new column, worked out from each player’s date of birth to the date of their most recent valuation, so it lines up with the market value.</p>
 <p>The combined dataset required meaningful cleaning before analysis. Player performance statistics were aggregated from individual match appearances into career totals, and the most recent market valuation for each player was identified from a full valuation history. Missing values were handled differently depending on what they represented: players with no recorded match appearances were removed, since no performance analysis was possible for them, while smaller gaps in fields like preferred foot or birth country were filled with an explicit <em>“Unknown”</em> label rather than guessed. A data entry error was also identified and corrected, where two players had implausible height values that appeared to be a unit mismatch in the source data. A small number of players (62, under 1% of the dataset) had their position listed as “Missing” in the original source data - this was retained as-is given its negligible size rather than dropped or guessed. After cleaning, the dataset consisted of just over 27,000 players with complete, usable records across all key fields.</p>
 </section>
 <section id="raw-vs-cleaned-data" class="level2">
@@ -232,7 +236,7 @@ ul.task-list li input[type="checkbox"] {
 <figcaption>Player age vs.&nbsp;market value</figcaption>
 </figure>
 </div>
-<p><em>Market value tends to peak between ages 25 and 27, then gradually declines as players move further into their thirties.</em></p>
+<p><em>Median value rises from about 300,000 euros at ages 18 to 20 to around 500,000 euros in the mid-twenties, stays there until about 28, then falls to about 100,000 euros by 37 to 38. Age is measured at each player’s most recent valuation.</em></p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="images/04_goals_vs_assists.png" class="img-fluid figure-img"></p>
@@ -260,7 +264,7 @@ ul.task-list li input[type="checkbox"] {
 <figcaption>Correlation between key player metrics</figcaption>
 </figure>
 </div>
-<p><em>Market value correlates positively with career games, goals, and international caps, and negatively with age, suggesting younger, more active players tend to carry higher valuations.</em></p>
+<p><em>Market value is only weakly related to the other metrics (0.23 to 0.29), and slightly negative with age (-0.16). Games, goals, assists and minutes are strongly linked to each other, since players who play more pile up more of everything.</em></p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="images/08_top_nationalities.png" class="img-fluid figure-img"></p>
@@ -281,7 +285,7 @@ ul.task-list li input[type="checkbox"] {
 <figcaption>Distribution of player ages</figcaption>
 </figure>
 </div>
-<p><em>The player population skews toward players in their mid-to-late twenties, with a sharp drop-off in representation past age 35.</em></p>
+<p><em>Most ages from about 24 to 34 have roughly 1,500 to 1,700 players each, then the count drops sharply after 35. Very few players are under 18 or over 40.</em></p>
 
 
 </section>
