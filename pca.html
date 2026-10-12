@@ -155,7 +155,8 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#data-prep" id="toc-data-prep" class="nav-link active" data-scroll-target="#data-prep">Data Prep</a></li>
+  <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview">Overview</a></li>
+  <li><a href="#data-prep" id="toc-data-prep" class="nav-link" data-scroll-target="#data-prep">Data Prep</a></li>
   <li><a href="#code" id="toc-code" class="nav-link" data-scroll-target="#code">Code</a></li>
   <li><a href="#results" id="toc-results" class="nav-link" data-scroll-target="#results">Results</a>
   <ul class="collapse">
@@ -189,6 +190,8 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
+<section id="overview" class="level2">
+<h2 class="anchored" data-anchor-id="overview">Overview</h2>
 <p>PCA is a way to simplify data that has a lot of columns. Many columns end up telling the same story. For example, players who score more also tend to assist more, and players with more international caps tend to be worth more. PCA combines the original columns into a smaller set of new ones, called principal components. The first component points in the direction where players differ the most. The second points in the next biggest direction that is at a right angle to the first, and so on. The components don’t overlap with each other.</p>
 <p>Under the hood, the directions are the eigenvectors of the data’s covariance matrix, and the eigenvalues say how much of the variation each direction holds. A big eigenvalue means that component matters a lot. The numbers inside an eigenvector, called loadings, show how much each original column contributes. The same result also comes from the singular value decomposition (SVD). PCA is just the SVD of the centered data, with the squared singular values (divided by n − 1) giving the eigenvalues.</p>
 <p>Dimensionality reduction means keeping only the first few components, so the data can be described with fewer columns and lose as little as possible. This matters because data with many columns is hard to work with. It can’t be plotted, columns repeat each other, distances stop being meaningful as columns pile up, and models can overfit. Fewer dimensions make the data easier to see, explore and model. Here, PCA shows how many separate ideas are hiding in the eight player features and what they mean.</p>
@@ -206,6 +209,7 @@ ul.task-list li input[type="checkbox"] {
 </figure>
 </div>
 <p><em>Each point is projected onto PC1 (red), turning two dimensions into one. The closer the points are to that line, the less information is lost.</em></p>
+</section>
 <section id="data-prep" class="level2">
 <h2 class="anchored" data-anchor-id="data-prep">Data Prep</h2>
 <p>PCA needs numbers with no missing values, and the columns need to be on the same scale. Otherwise a column with big numbers would take over just because of its units. The same eight standardized features and 2,000-player sample from the clustering tab are used: age, height, minutes (log), goals, assists and yellow cards per 90 minutes, caps (log) and market value (log). Position, name and club are not part of the PCA and are only used later to color the plots.</p>

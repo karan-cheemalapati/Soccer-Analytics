@@ -155,7 +155,8 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#data-prep" id="toc-data-prep" class="nav-link active" data-scroll-target="#data-prep">Data Prep</a></li>
+  <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview">Overview</a></li>
+  <li><a href="#data-prep" id="toc-data-prep" class="nav-link" data-scroll-target="#data-prep">Data Prep</a></li>
   <li><a href="#code" id="toc-code" class="nav-link" data-scroll-target="#code">Code</a></li>
   <li><a href="#results" id="toc-results" class="nav-link" data-scroll-target="#results">Results</a>
   <ul class="collapse">
@@ -189,6 +190,8 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
+<section id="overview" class="level2">
+<h2 class="anchored" data-anchor-id="overview">Overview</h2>
 <p>Clustering is a way to group things that look alike without telling the computer what the groups are. Every player is a row of numbers, and the method puts players with similar numbers together. Since nobody supplies the answer, it works well for finding patterns that were not obvious before.</p>
 <p>There are two main styles. In partitional clustering, like k-means, the number of groups (k) is chosen first. The method places k centers in the data, assigns each player to the closest center, moves each center to the middle of its group, and repeats until nothing changes. In hierarchical clustering, every player starts as their own group, and the two closest groups are merged over and over until only one is left. The merges are drawn as a tree called a dendrogram, and cutting the tree at any height gives a set of clusters.</p>
 <p>Both styles need a way to measure how close two players are. K-means here uses regular straight-line (Euclidean) distance. The hierarchical clustering uses cosine distance, which looks at the pattern of a player’s numbers instead of how big they are, and it joins groups using the average distance between their members (average linkage).</p>
@@ -207,6 +210,7 @@ ul.task-list li input[type="checkbox"] {
 </figure>
 </div>
 <p><em>A dendrogram for 25 randomly chosen players, built by merging the closest groups step by step. The taller a join is, the further apart the merged groups were.</em></p>
+</section>
 <section id="data-prep" class="level2">
 <h2 class="anchored" data-anchor-id="data-prep">Data Prep</h2>
 <p>Clustering only works on numbers with no labels. Position, name and club were taken out and kept on the side, just to help read the clusters later.</p>
