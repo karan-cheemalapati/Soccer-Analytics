@@ -2,6 +2,8 @@
 title: "Clustering"
 ---
 
+## Overview 
+
 Clustering is a way to group things that look alike without telling the computer what the groups are. Every player is a row of numbers, and the method puts players with similar numbers together. Since nobody supplies the answer, it works well for finding patterns that were not obvious before.
 
 There are two main styles. In partitional clustering, like k-means, the number of groups (k) is chosen first. The method places k centers in the data, assigns each player to the closest center, moves each center to the middle of its group, and repeats until nothing changes. In hierarchical clustering, every player starts as their own group, and the two closest groups are merged over and over until only one is left. The merges are drawn as a tree called a dendrogram, and cutting the tree at any height gives a set of clusters.

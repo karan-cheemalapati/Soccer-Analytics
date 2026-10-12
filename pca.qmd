@@ -2,6 +2,8 @@
 title: "PCA"
 ---
 
+## Overview
+
 PCA is a way to simplify data that has a lot of columns. Many columns end up telling the same story. For example, players who score more also tend to assist more, and players with more international caps tend to be worth more. PCA combines the original columns into a smaller set of new ones, called principal components. The first component points in the direction where players differ the most. The second points in the next biggest direction that is at a right angle to the first, and so on. The components don't overlap with each other.
 
 Under the hood, the directions are the eigenvectors of the data's covariance matrix, and the eigenvalues say how much of the variation each direction holds. A big eigenvalue means that component matters a lot. The numbers inside an eigenvector, called loadings, show how much each original column contributes. The same result also comes from the singular value decomposition (SVD). PCA is just the SVD of the centered data, with the squared singular values (divided by n − 1) giving the eigenvalues.
