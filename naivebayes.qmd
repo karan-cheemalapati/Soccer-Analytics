@@ -14,6 +14,22 @@ NB is fast, works with small amounts of data and is a common first baseline. It 
 
 **Multinomial NB** is the version used here. It was designed for counts, like how many times each word appears in a message. For each class it estimates how the "weight" is spread across the features, so it needs non-negative inputs. A smoothing setting (alpha = 1, also called Laplace smoothing) stops a feature that never showed up in a class from forcing the whole probability to zero.
 
+**How the model is trained and makes a prediction.** Training is really just counting. For each position, the model works out how common that position is (the prior) and how the feature values are spread among players in that position (the likelihood). To predict a new player, it takes each position's prior, multiplies it by the likelihood of every one of the player's features, and picks the position with the highest result. The toy example below shows the idea: a player who scores a lot is far more likely to be an attacker than a goalkeeper, even though the model started with all three positions as possible.
+
+![](images/nb_ov_01_toy.png)
+
+*A toy example of how Naive Bayes picks a position*
+
+*Priors of 10%, 45% and 45% are multiplied by how likely a high-scoring player is in each position (2%, 10% and 50%), then scaled so the three results add up to 100%. Attack wins with about 83%.*
+
+**Why smoothing is needed.** Naive Bayes multiplies probabilities together, so a single zero wipes out everything. If a feature value never showed up for a position in the training data, its probability is exactly 0, and the whole score for that position becomes 0 no matter how well every other feature fits. That is a problem, because a feature missing from the training data doesn't mean it can never happen. Smoothing fixes this by adding a small amount (alpha = 1) to every count, so nothing is ever exactly zero.
+
+![](images/nb_ov_02_smoothing.png)
+
+*The effect of smoothing on a toy count*
+
+*Without smoothing, goalkeepers get a probability of exactly 0 for this feature. With one added to every count, they get a small but non-zero probability, and the other positions barely change. The smoothed value is (count + 1) divided by (class total + 3), where 3 is the number of features in this toy example.*
+
 **Bernoulli NB** is the version for yes/no features: each feature is simply present (1) or absent (0). The difference from multinomial is that Bernoulli also counts the absence of a feature as evidence, so "this word does not appear in the email" pushes the prediction too. It fits data like "did the word appear at all".
 
 A third version, **Gaussian NB**, models each continuous feature as a bell curve per class. It is not required here, but it is included in the results as a comparison.
@@ -31,6 +47,12 @@ The labeled sample has 5,000 players, drawn at random from the cleaned data (pla
 *Each row is a player. The last column, position, is the label the model learns to predict from the other columns.*
 
 Multinomial NB in scikit-learn only accepts non-negative numbers, so the skewed columns were log-transformed (as in the clustering tab) and then every feature was rescaled to a 0 to 1 range. The scaler learned its minimum and maximum from the training set only.
+
+![](images/nb_scaled.png)
+
+*Training data after cleaning and scaling*
+
+*This is what the model actually receives: every feature is between 0 and 1, so multinomial NB can use it.*
 
 **Training and testing sets.** The sample was split 80/20 at random, with the same position mix in both parts. The training set (4,000 players) is used to build the model. The testing set (1,000 players) is kept aside and only used at the end to measure accuracy.
 

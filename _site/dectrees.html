@@ -280,6 +280,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="data-prep">Data Prep</h2>
 <p>Supervised learning needs <strong>labeled data</strong>: every row comes with the correct answer, so the model can learn from examples and we can check its guesses afterwards. Only labeled data can be used. For decision trees the label is a player’s <strong>value tier</strong>: the players were split into thirds by market value, giving Low (up to about 250K euros), Medium (up to about 1M euros) and High (above that). The features are age, height, minutes played, goals, assists and yellow cards per 90 minutes, international caps and the player’s position. Market value itself is not a feature, since it would give away the label.</p>
 <p>Scikit-learn trees need numbers only, so position was one-hot encoded into four 0/1 columns. Trees do not need rescaling, so the other columns stay in their original units, which keeps the trees easy to read.</p>
+<p><img src="images/dt_model_ready.png" class="img-fluid"></p>
+<p><em>Training data as the trees receive it</em></p>
+<p><em>Position has become four 0/1 columns, one per position, and every other feature keeps its original units.</em></p>
 <p>The labeled sample is the same 5,000 players used in the Naive Bayes tab, now with the value tier added.</p>
 <p><img src="images/dt_sample.png" class="img-fluid"> <em>Sample of the labeled data used for decision trees</em></p>
 <p><em>The last column, value tier, is the label. Position is shown here for readability and is one-hot encoded before modeling.</em></p>

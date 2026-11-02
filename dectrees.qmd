@@ -42,6 +42,12 @@ Supervised learning needs **labeled data**: every row comes with the correct ans
 
 Scikit-learn trees need numbers only, so position was one-hot encoded into four 0/1 columns. Trees do not need rescaling, so the other columns stay in their original units, which keeps the trees easy to read.
 
+![](images/dt_model_ready.png)
+
+*Training data as the trees receive it*
+
+*Position has become four 0/1 columns, one per position, and every other feature keeps its original units.*
+
 The labeled sample is the same 5,000 players used in the Naive Bayes tab, now with the value tier added.
 
 ![](images/dt_sample.png)

@@ -256,6 +256,14 @@ window.Quarto = {
 <p>In plain terms, the chance that a player is a goalkeeper given his stats depends on two things: how common goalkeepers are overall (the prior) and how typical those stats are for a goalkeeper (the likelihood). The “naive” part is a simplifying assumption: once the class is known, every feature is treated as independent of the others. That is not strictly true (goals and assists clearly move together), but it makes the math very cheap, because the model only multiplies one small probability per feature. The class with the highest result is the prediction.</p>
 <p>NB is fast, works with small amounts of data and is a common first baseline. It is best known for spam filtering and sorting text into topics, and it is useful anywhere there are many features and a clear label to predict.</p>
 <p><strong>Multinomial NB</strong> is the version used here. It was designed for counts, like how many times each word appears in a message. For each class it estimates how the “weight” is spread across the features, so it needs non-negative inputs. A smoothing setting (alpha = 1, also called Laplace smoothing) stops a feature that never showed up in a class from forcing the whole probability to zero.</p>
+<p><strong>How the model is trained and makes a prediction.</strong> Training is really just counting. For each position, the model works out how common that position is (the prior) and how the feature values are spread among players in that position (the likelihood). To predict a new player, it takes each position’s prior, multiplies it by the likelihood of every one of the player’s features, and picks the position with the highest result. The toy example below shows the idea: a player who scores a lot is far more likely to be an attacker than a goalkeeper, even though the model started with all three positions as possible.</p>
+<p><img src="images/nb_ov_01_toy.png" class="img-fluid"></p>
+<p><em>A toy example of how Naive Bayes picks a position</em></p>
+<p><em>Priors of 10%, 45% and 45% are multiplied by how likely a high-scoring player is in each position (2%, 10% and 50%), then scaled so the three results add up to 100%. Attack wins with about 83%.</em></p>
+<p><strong>Why smoothing is needed.</strong> Naive Bayes multiplies probabilities together, so a single zero wipes out everything. If a feature value never showed up for a position in the training data, its probability is exactly 0, and the whole score for that position becomes 0 no matter how well every other feature fits. That is a problem, because a feature missing from the training data doesn’t mean it can never happen. Smoothing fixes this by adding a small amount (alpha = 1) to every count, so nothing is ever exactly zero.</p>
+<p><img src="images/nb_ov_02_smoothing.png" class="img-fluid"></p>
+<p><em>The effect of smoothing on a toy count</em></p>
+<p><em>Without smoothing, goalkeepers get a probability of exactly 0 for this feature. With one added to every count, they get a small but non-zero probability, and the other positions barely change. The smoothed value is (count + 1) divided by (class total + 3), where 3 is the number of features in this toy example.</em></p>
 <p><strong>Bernoulli NB</strong> is the version for yes/no features: each feature is simply present (1) or absent (0). The difference from multinomial is that Bernoulli also counts the absence of a feature as evidence, so “this word does not appear in the email” pushes the prediction too. It fits data like “did the word appear at all”.</p>
 <p>A third version, <strong>Gaussian NB</strong>, models each continuous feature as a bell curve per class. It is not required here, but it is included in the results as a comparison.</p>
 </section>
@@ -267,6 +275,9 @@ window.Quarto = {
 <p><em>Sample of the labeled data used for Naive Bayes</em></p>
 <p><em>Each row is a player. The last column, position, is the label the model learns to predict from the other columns.</em></p>
 <p>Multinomial NB in scikit-learn only accepts non-negative numbers, so the skewed columns were log-transformed (as in the clustering tab) and then every feature was rescaled to a 0 to 1 range. The scaler learned its minimum and maximum from the training set only.</p>
+<p><img src="images/nb_scaled.png" class="img-fluid"></p>
+<p><em>Training data after cleaning and scaling</em></p>
+<p><em>This is what the model actually receives: every feature is between 0 and 1, so multinomial NB can use it.</em></p>
 <p><strong>Training and testing sets.</strong> The sample was split 80/20 at random, with the same position mix in both parts. The training set (4,000 players) is used to build the model. The testing set (1,000 players) is kept aside and only used at the end to measure accuracy.</p>
 <p><img src="images/nb_train.png" class="img-fluid"> <em>Training set (first rows)</em></p>
 <p><em>Players the model learns from.</em></p>
