@@ -26,6 +26,41 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -150,8 +185,23 @@ ul.task-list li input[type="checkbox"] {
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-        
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview">Overview</a></li>
+  <li><a href="#data-prep" id="toc-data-prep" class="nav-link" data-scroll-target="#data-prep">Data Prep</a></li>
+  <li><a href="#code" id="toc-code" class="nav-link" data-scroll-target="#code">Code</a></li>
+  <li><a href="#results" id="toc-results" class="nav-link" data-scroll-target="#results">Results</a>
+  <ul class="collapse">
+  <li><a href="#linear-regression" id="toc-linear-regression" class="nav-link" data-scroll-target="#linear-regression">Linear regression</a></li>
+  <li><a href="#logistic-regression" id="toc-logistic-regression" class="nav-link" data-scroll-target="#logistic-regression">Logistic regression</a></li>
+  <li><a href="#comparison-with-naive-bayes" id="toc-comparison-with-naive-bayes" class="nav-link" data-scroll-target="#comparison-with-naive-bayes">Comparison with Naive Bayes</a></li>
+  </ul></li>
+  <li><a href="#conclusions" id="toc-conclusions" class="nav-link" data-scroll-target="#conclusions">Conclusions</a></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -175,9 +225,147 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<p>Content coming soon.</p>
+<section id="overview" class="level2">
+<h2 class="anchored" data-anchor-id="overview">Overview</h2>
+<p>Regression is about predicting something from other things you already know. The two versions used here differ in what they predict.</p>
+<p><strong>Linear regression</strong> predicts a number. It draws the straight line (or, with many features, the flat surface) that fits the data best, by making the errors between the line and the real points as small as possible. For a player, that means adding up each feature multiplied by a weight, plus a starting amount. Here it predicts a player’s market value (on a log scale, because values are very skewed). Each weight, called a coefficient, says how much the prediction moves when that feature goes up by one.</p>
+<p><img src="images/reg_ov_01_linear.png" class="img-fluid"></p>
+<p><em>Linear regression fits the line that makes the errors smallest</em></p>
+<p><em>The gray lines are the errors. The best-fit line is the one where those errors are smallest overall.</em></p>
+<p><strong>Logistic regression</strong> predicts a class, not a number. Here the two classes are “High” (a player in the top third by market value) and “Not High”. It starts the same way as linear regression, by adding up weighted features into one score. But a score can be any number, and we need a probability between 0 and 1. The <strong>sigmoid</strong> function does that: very low scores become probabilities near 0, very high scores become probabilities near 1, and a score of 0 becomes exactly 0.5. The model then turns the probability into a class: above 0.5 it predicts High, otherwise Not High.</p>
+<p><img src="images/reg_ov_02_sigmoid.png" class="img-fluid"></p>
+<p><em>The sigmoid turns a linear score into a probability</em></p>
+<p><em>The score on the bottom can be anything. The curve squeezes it into a probability, and 0.5 is the cutoff between the two classes.</em></p>
+<p><strong>How they differ.</strong> Linear regression predicts how much, and its error is measured in distance (RMSE, MAE) and R squared. Logistic regression predicts which one, and it is measured with accuracy and a confusion matrix. Logistic coefficients also work differently: they change the log-odds of being in the class, so a coefficient is easiest to read as an odds ratio. An odds ratio above 1 means the feature makes High more likely, and below 1 means less likely.</p>
+</section>
+<section id="data-prep" class="level2">
+<h2 class="anchored" data-anchor-id="data-prep">Data Prep</h2>
+<p>Supervised modeling needs <strong>labeled data</strong>, which means every player comes with the right answer, so the model can learn from examples and we can check its guesses afterwards. Both models use the same 5,000-player labeled sample from the earlier tabs.</p>
+<ul>
+<li><strong>Linear regression</strong> needs a numeric target. The target column is <code>value_log</code>, the log of a player’s market value.</li>
+<li><strong>Logistic regression</strong> needs a two-class label. The label is <code>is_high</code>, which is 1 for players in the top value tier (above about €1M) and 0 for everyone else.</li>
+<li><strong>Features</strong> are the same for both: age, height, minutes played (log), goals, assists and yellow cards per 90 minutes, caps (log), and position. Position is turned into 0/1 columns, with Goalkeeper left out as the starting point. Market value itself is never a feature, since it would give away the answer.</li>
+</ul>
+<p><img src="images/reg_sample.png" class="img-fluid"></p>
+<p><em>Sample of the data used for regression</em></p>
+<p><em>The last two columns are the targets: <code>value_log</code> for linear regression and <code>is_high</code> for logistic regression.</em></p>
+<p><strong>Training and testing sets.</strong> The sample was split 80/20 at random, with the same mix of value tiers in both parts. The training set (4,000 players) builds the models and the testing set (1,000 players) is kept aside. This is the same split used for the Part 3 decision trees, which makes later comparisons fair.</p>
+<p><img src="images/reg_train.png" class="img-fluid"></p>
+<p><em>Training set (first rows)</em></p>
+<p><em>Players the models learn from.</em></p>
+<p><img src="images/reg_test.png" class="img-fluid"></p>
+<p><em>Testing set (first rows)</em></p>
+<p><em>Players the models have never seen.</em></p>
+<p>The two sets must be <strong>disjoint</strong>, with no player in both. If a player were in both, the model would be graded on answers it had already seen, which makes accuracy look better than it really is (data leakage). The code checks that the two sets share no rows.</p>
+<p><strong>Choosing settings without touching the test set.</strong> The one setting that needed choosing was the strength of regularization (C) in logistic regression. That was picked with 5-fold cross-validation inside the training set only. Linear regression has no settings to tune, so its training-set cross-validation score is reported as a check. Both final models were then evaluated once on the testing set.</p>
+<p>Data files: <a href="https://github.com/karan-cheemalapati/Soccer-Analytics/blob/main/data/samples/supervised_sample_labeled.csv">full sample (CSV)</a>, <a href="https://github.com/karan-cheemalapati/Soccer-Analytics/blob/main/data/samples/reg_train.csv">regression training set (CSV)</a> and <a href="https://github.com/karan-cheemalapati/Soccer-Analytics/blob/main/data/samples/reg_test.csv">regression testing set (CSV)</a></p>
+</section>
+<section id="code" class="level2">
+<h2 class="anchored" data-anchor-id="code">Code</h2>
+<p>All the steps on this page are in the <a href="https://github.com/karan-cheemalapati/Soccer-Analytics/blob/main/notebooks/04_regression_adaboost.ipynb">Regression and AdaBoost notebook</a>. It is written in Python with scikit-learn. The core of both models is short:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>lin <span class="op">=</span> LinearRegression().fit(X_train, train[<span class="st">"value_log"</span>])</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>logit <span class="op">=</span> make_pipeline(StandardScaler(), LogisticRegression(C<span class="op">=</span><span class="dv">100</span>))</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>logit.fit(X_train, train[<span class="st">"is_high"</span>])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="results" class="level2">
+<h2 class="anchored" data-anchor-id="results">Results</h2>
+<section id="linear-regression" class="level3">
+<h3 class="anchored" data-anchor-id="linear-regression">Linear regression</h3>
+<p>Linear regression predicts a player’s market value on the log scale. On the 1,000 players in the testing set:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Measure</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Test RMSE</td>
+<td>1.06</td>
+</tr>
+<tr class="even">
+<td>Test MAE</td>
+<td>0.86</td>
+</tr>
+<tr class="odd">
+<td>Test R squared</td>
+<td>0.58</td>
+</tr>
+<tr class="even">
+<td>Cross-validation R squared (training set, 5 folds)</td>
+<td>0.60</td>
+</tr>
+</tbody>
+</table>
+<p>Because the target is a log, an error of 0.86 means a typical prediction is off by a factor of about 2.4 in euros. R squared of 0.58 means the features explain about 58% of the differences in value between players the model had never seen. The cross-validation score on the training data (0.60) is close to the test score, so the model is not overfitting.</p>
+<p><img src="images/reg_01_pred_vs_actual.png" class="img-fluid"></p>
+<p><em>Predicted vs actual value on the testing set</em></p>
+<p><em>Points on the red line would be perfect predictions. The cloud follows the line, but the model guesses too high for many cheap players and too low for the most expensive ones, which is typical for a straight-line model.</em></p>
+<p>Two coefficients in plain words (they are on the log scale, so each one is converted to a percentage):</p>
+<ul>
+<li><strong>Age (-0.217).</strong> Each extra year of age goes with a market value about 20% lower, comparing players who are the same on everything else.</li>
+<li><strong>Goals per 90 minutes (+1.54).</strong> A player who scores 0.1 more goals per 90 minutes is valued about 17% higher, again with everything else equal.</li>
+</ul>
+<p>These describe patterns in the data, not causes. Goals and assists move together, so single coefficients shouldn’t be over-read.</p>
+</section>
+<section id="logistic-regression" class="level3">
+<h3 class="anchored" data-anchor-id="logistic-regression">Logistic regression</h3>
+<p>Logistic regression predicts whether a player is in the High value tier (about €1M and above). The one setting to choose was the regularization strength (C), picked with 5-fold cross-validation on the training set only.</p>
+<p><img src="images/reg_cv_table.png" class="img-fluid"></p>
+<p><em>Cross-validation accuracy for each value of C</em></p>
+<p><em>Accuracy climbs from 79% to about 84% as C grows, then stays flat from 0.1 upward, so the choice barely matters here. The largest value, C = 100, was used.</em></p>
+<p>On the testing set the model got <strong>80.2%</strong> right, compared with 66.6% for always guessing “Not High”.</p>
+<p><img src="images/reg_02_logit_confusion.png" class="img-fluid"></p>
+<p><em>Confusion matrix for logistic regression</em></p>
+<p><em>Rows are the true class and columns are the predicted class.</em></p>
+<p>Of the 666 Not High players, 580 were correct (87%). Of the 334 High players, 222 were found (66%) and 112 were missed, and 86 Not High players were wrongly flagged as High. When the model says High, it is right 72% of the time (222 of 308). The cross-validation accuracy on the training data (84%) was a few points above the test accuracy, so the test number is the one to trust.</p>
+<p>The features were standardized, so each odds ratio is per one standard deviation. <strong>Age has an odds ratio of 0.13</strong>: a player one standard deviation older than average has about 87% lower odds of being in the High tier, with the other features held fixed. Minutes played goes the other way, with an odds ratio of 3.75.</p>
+</section>
+<section id="comparison-with-naive-bayes" class="level3">
+<h3 class="anchored" data-anchor-id="comparison-with-naive-bayes">Comparison with Naive Bayes</h3>
+<p>The Naive Bayes model in Part 3 predicted position, which is a different label, so Naive Bayes was refit here on the same High vs Not High label and the same split.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Model</th>
+<th>Testing accuracy</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Logistic regression</td>
+<td>80.2%</td>
+</tr>
+<tr class="even">
+<td>Gaussian Naive Bayes</td>
+<td>76.9%</td>
+</tr>
+<tr class="odd">
+<td>Multinomial Naive Bayes</td>
+<td>71.1%</td>
+</tr>
+<tr class="even">
+<td>Always guess “Not High”</td>
+<td>66.6%</td>
+</tr>
+</tbody>
+</table>
+<p><img src="images/reg_03_vs_naive_bayes.png" class="img-fluid"></p>
+<p><em>Logistic regression vs Naive Bayes on the same task</em></p>
+<p><em>Logistic regression is the most accurate of the three.</em></p>
+<p>Logistic regression won by about 3 points over Gaussian Naive Bayes and 9 over multinomial. A likely reason is that logistic regression learns all its weights together, so overlapping features like goals and assists or minutes and caps are handled jointly, while Naive Bayes assumes every feature is independent. Multinomial Naive Bayes was also built for counts rather than measurements like these. With 1,000 test players a 3-point gap is modest, but the order matches what you would expect.</p>
+</section>
+</section>
+<section id="conclusions" class="level2">
+<h2 class="anchored" data-anchor-id="conclusions">Conclusions</h2>
+<p>A player’s market value is partly predictable from his numbers, but only partly. Linear regression explains about 58% of the differences in log value, and a typical miss is still a factor of 2.4 in euros. For the simpler question of whether a player is in the top value tier, logistic regression is right about 80% of the time, well above the 67% from guessing.</p>
+<p>The same drivers show up in both models. Age pulls value down, while minutes played, international caps and scoring and assisting output push it up, and position still matters once the stats are equal. That fits the research questions on age, caps and playing time from the Introduction.</p>
+<p>The remaining 42% is the part the stat sheet can’t see: reputation, club, contract length and the other things mentioned in the Introduction. Logistic regression also beat Naive Bayes on the same task, so a model that learns its weights jointly suits this data better than one that treats every stat as independent.</p>
 
 
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
